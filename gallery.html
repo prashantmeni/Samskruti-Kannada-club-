@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gallery page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+  body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f6f1;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: linear-gradient(to right, #E1D214, #ED0303);
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .cmritlogo, .clublogo {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      top: 10px;
+    }
+    .cmritlogo { left: 2.5%; }
+    .clublogo { right: 2.5%; }
+    header h1 {
+      margin: 0;
+      line-height: 70px;
+      color: white;
+      font-size: 20px;
+    }
+  .content {
+    padding-top: 90px; /* space below fixed header */
+    padding-bottom: 70px; /* space above fixed footer */
+  }
+  .horizontal-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px;
+    scroll-behavior: smooth;
+  }
+  .gallery-item {
+    flex: 0 0 auto;
+    width: 200px;
+    border: 3px solid #8b0000;
+    border-radius: 10px;
+    background-color: white;
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 2px solid #8b0000;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  .caption {
+    text-align: center;
+    padding: 10px;
+    background: linear-gradient(to right, #E1D214, #ED0303);
+    color: white;
+    font-weight: bold;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+  .horizontal-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 2.5px;
+  padding: 10px;
+}
+.horizontal-gallery::-webkit-scrollbar {
+  display: none;
+}
+  .footer-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(to right, #E1D214, #ED0303);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+  .footer-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
+  }
+  .footer-nav i {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 3px;
+  }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/storage/emulated/0/logo/Silver Jubilee.png" alt="cmrit Logo" class="cmritlogo">
+    <img src="/storage/emulated/0/logo/1000108814-removebg-preview.png" alt="Club Logo" class="clublogo">
+    <h1>ಸಂಸ್ಕೃತಿ ಕನ್ನಡ ಸಂಘ</h1>
+    
+  </header>
+  <div class="content 1">
+    <div class="horizontal-gallery">
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/IMG_20250402_141758-1.jpg" alt="Event 1"><div class="caption">Cultural Fest</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 2"><div class="caption">Kannada Rajyotsava</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 3"><div class="caption">Folk Dance</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 4"><div class="caption">Traditional Dress Day</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 5"><div class="caption">Debate Competition</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 6"><div class="caption">Rangoli Contest</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 7"><div class="caption">Drama Performance</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 8"><div class="caption">Kannada Quiz</div></div>
+    <div class="gallery-item"><img src="/storage/emulated/0/Download/-storage-emulated-0-Android-media-com.whatsapp-WhatsApp-Media-WhatsApp Images-IMG-20250107-WA0007.jpg" alt="Event 9"><div class="caption">Prize Distribution</div></div>
+      
+    </div>
+  </div>
+  <footer>
+    <div class="footer-nav">
+      <a href="index.html"><i class="fas fa-home"></i>Home</a>
+      <a href="gallery.html"><i class="fas fa-camera"></i>Gallery</a>
+      <a href="events.html"><i class="fas fa-trophy"></i>Events</a>
+      <a href="about.html"><i class="fas fa-user"></i>About</a>
+      
+    </div>
+  </footer>
+</body>
+</html>
