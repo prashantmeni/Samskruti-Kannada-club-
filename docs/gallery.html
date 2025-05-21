@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samskruthi Kannada Sangha - Gallery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body[lang="kn"] {
+      font-family: 'Noto Sans Kannada', sans-serif;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 15px 20px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cmritlogo,
+    .clublogo {
+      height: 40px;
+      width: 40px;
+      object-fit: contain;
+    }
+
+    .club-name-canvas {
+      flex-grow: 1;
+      height: 37px;
+      text-align: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #langBtn {
+      background: #fff;
+      color: #1976d2;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .content {
+      padding: 80px 20px 80px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #1976d2;
+    }
+
+    .section-title i {
+      font-size: 1.3rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .gallery-item {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-item:hover {
+      transform: scale(1.03);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    /*.gallery-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: center;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }*/
+
+    /* Footer */
+footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    footer.hidden {
+      transform: translateY(100%);
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      align-items: center;
+    }
+
+    .footer-nav a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.8rem;
+      text-align: center;
+      transition: color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+    }
+
+    .footer-nav a.active {
+      color: #1976d2;
+    }
+
+    .footer-nav i {
+      font-size: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .content {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .event-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .content {
+        max-width: 1000px;
+      }
+
+      .event-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer-nav a {
+        font-size: 0.7rem;
+      }
+
+      .footer-nav i {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      .content {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+
+      .gallery-item {
+        height: 200px;
+      }
+
+      .gallery-caption {
+        font-size: 1rem;
+        padding: 10px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .content {
+        max-width: 1000px;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+
+      .gallery-item {
+        height: 250px;
+      }
+
+      .gallery-caption {
+        font-size: 1.1rem;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/storage/emulated/0/logo/cmritlogo.png" class="cmritlogo" alt="CMRIT Logo" />
+    <canvas id="clubNameCanvas" class="club-name-canvas"></canvas>
+    <div class="header-right">
+      <button id="langBtn" aria-label="Toggle Language">ಕ</button>
+      <img src="/storage/emulated/0/logo/clublogo.png" alt="Club Logo" class="clublogo" />
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="section">
+      <h2 class="section-title">
+        <i class="fas fa-camera-retro"></i>
+        <span data-en="Cultura-25" data-kn="ಕಲ್ಚುರಾ-25">Cultura-25</span>
+      </h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25.jpg" alt="Cultura-25 Image 1" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_2.jpg" alt="Cultura-25 Image 2" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_3.jpg" alt="Cultura-25 Image 3" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_3.jpg" alt="Cultura-25 Image 3" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">
+        <i class="fas fa-camera-retro"></i>
+        <span data-en="Bid Samara" data-kn="ಬಿಡ್ ಸಮರ">Bid Samara</span>
+      </h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Green and White Modern Internship Program Instagram Post_20250519_125045_0000.png" alt="Bid Samara Image 1" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Bid_samara_2.jpg" alt="Bid Samara Image 2" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_3.jpg" alt="Cultura-25 Image 3" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_3.jpg" alt="Cultura-25 Image 3" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">
+        <i class="fas fa-camera-retro"></i>
+        <span data-en="Aisiri-24" data-kn="ಐಸಿರ-೨೪ ">Team Bonding</span>
+      </h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Team_bonding.jpg" alt="Team Bonding Image 1" loading="lazy" />
+         
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Team_bonding_2.jpg" alt="Team Bonding Image 2" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Team_bonding_3.jpg" alt="Team Bonding Image 3" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Cultura_25_3.jpg" alt="Cultura-25 Image 3" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">
+        <i class="fas fa-camera-retro"></i>
+        <span data-en="Sangama" data-kn="ಸಂಗಮ">Kannada Rajyotsava</span>
+      </h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Kannada_rajyotsava.jpg" alt="Kannada Rajyotsava Image 1" loading="lazy" />
+        </div>
+        <div class="gallery-item">
+          <img src="/storage/emulated/0/Pictures/Canva/Kannada_rajyotsava_2.jpg" alt="Kannada Rajyotsava Image 2" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer">
+    <div class="footer-nav">
+      <a href="index.html" aria-label="Home"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
+      <a href="gallery.html" aria-label="Gallery"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
+      <a href="events.html" aria-label="Events"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
+      <a href="about.html" aria-label="About"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
+    </div>
+  </footer>
+
+  <script>
+    // Canvas Animation for Club Name (Fade-In and Pulse)
+    const canvas = document.getElementById("clubNameCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+
+    function resizeCanvas() {
+      width = canvas.parentElement.clientWidth - 120;
+      height = 40;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const text = "ಸಂಸ್ಕೃತಿ ಕನ್ನಡ ಸಂಘ";
+    const fontSize = 22;
+    let alpha = 0;
+    let scale = 1;
+    let time = 0;
+
+    function animateText() {
+      ctx.clearRect(0, 0, width, height);
+      time += 0.05;
+
+      ctx.font = `${fontSize}px 'Noto Sans Kannada', sans-serif`;
+      const textWidth = ctx.measureText(text).width;
+      const x = (width - textWidth) / 2;
+      const y = height / 2 + 8;
+
+      alpha = Math.min(alpha + 0.02, 1);
+      scale = 1 + Math.sin(time) * 0.05;
+
+      const gradient = ctx.createLinearGradient(x, 0, x + textWidth, 0);
+      gradient.addColorStop(0, "#1976d2");
+      gradient.addColorStop(0.5, "#42a5f5");
+      gradient.addColorStop(1, "#1976d2");
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = alpha;
+
+      ctx.save();
+      ctx.translate(x + textWidth / 2, y);
+      ctx.scale(scale, scale);
+      ctx.translate(-(x + textWidth / 2), -y);
+      ctx.fillText(text, x, y);
+      ctx.restore();
+
+      if (time > 2 * Math.PI) {
+        time = 0;
+        alpha = 0;
+      }
+
+      requestAnimationFrame(animateText);
+    }
+
+    animateText();
+
+    // Language Toggle
+    const langBtn = document.getElementById("langBtn");
+    let currentLang = localStorage.getItem("preferredLang") || "kn";
+
+    function updateLanguage(lang) {
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+      langBtn.textContent = lang === "kn" ? "ಕ" : "E";
+      document.documentElement.lang = lang;
+      localStorage.setItem("preferredLang", lang);
+    }
+
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "kn" ? "en" : "kn";
+      updateLanguage(currentLang);
+    });
+
+    updateLanguage(currentLang);
+
+    // Active Nav Highlight
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    document.querySelectorAll(".footer-nav a").forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    // Footer Scroll Hide/Show
+    let lastScroll = 0;
+    const footer = document.getElementById("footer");
+
+    window.addEventListener("scroll", () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentScroll > lastScroll) {
+        footer.classList.add("hidden");
+      } else {
+        footer.classList.remove("hidden");
+      }
+
+      lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+    });
+  </script>
+</body>
+</html>

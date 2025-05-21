@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samskruthi Kannada Sangha - Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body[lang="kn"] {
+      font-family: 'Noto Sans Kannada', sans-serif;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 15px 20px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cmritlogo,
+    .clublogo {
+      height: 40px;
+      width: 40px;
+      object-fit: contain;
+    }
+
+    .club-name-canvas {
+      flex-grow: 1;
+      height: 37px;
+      text-align: center;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #langBtn {
+      background: #fff;
+      color: #1976d2;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Carousel Styles */
+    :root {
+      --color-bg: #f5f7fa;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 50vw;
+      min-height: 300px;
+      max-height: 400px;
+      margin: 20px 0;
+      perspective: 100px;
+      overflow: hidden;
+      cursor: grab;
+      z-index: 1;
+    }
+
+    .carousel:active {
+      cursor: grabbing;
+    }
+
+    .viewport {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      overflow-x: scroll;
+      counter-reset: item;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      scrollbar-width: none;
+    }
+
+    .viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel::before,
+    .carousel::after {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500%;
+      height: 500%;
+      border-radius: 10%;
+      background: var(--color-bg);
+    }
+
+    .carousel::before {
+      top: -480%;
+    }
+
+    .carousel::after {
+      bottom: -480%;
+    }
+
+    .slide {
+      position: relative;
+      flex: 0 0 100%;
+      width: 100%;
+      counter-increment: item;
+    }
+
+    .snapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      scroll-snap-align: center;
+      background-size: cover;
+      background-position: center;
+      border: 10px solid var(--color-bg);
+    }
+
+    /* Content */
+    .content {
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1976d2;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .social a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #333;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 10px 15px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .social a i {
+      font-size: 24px;
+    }
+
+    .social a[href*="youtube"] {
+      background-color: #ffe6e6;
+    }
+
+    .social a[href*="youtube"]:hover {
+      background-color: #ff0000;
+      color: #fff;
+    }
+
+    .social a[href*="instagram"] {
+      background-color: #f9e6f0;
+    }
+
+    .social a[href*="instagram"]:hover {
+      background-color: #e1306c;
+      color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .social {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .social a {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .section-title i {
+      font-size: 1.3rem;
+    }
+
+    /* Horizontal Scroll for Categories */
+    .category-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scrollbar-width: none;
+    }
+
+    .category-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 10px;
+      text-align: center;
+      min-width: 250px;
+      height
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .category-card img {
+      width: 100%;
+      height:100px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 5px;
+    }
+
+    .category-card:hover {
+      transform: scale(1.05);
+    }
+
+    /* Event and Gallery Cards */
+    .event-preview,
+    .gallery-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card-content {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1976d2;
+      margin-bottom: 5px;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: #666;
+      text-align:center;
+    }
+
+    /* Footer */
+   footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    footer.hidden {
+      transform: translateY(100%);
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      align-items: center;
+    }
+
+    .footer-nav a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.8rem;
+      text-align: center;
+      transition: color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+    }
+
+    .footer-nav a.active {
+      color: #1976d2;
+    }
+
+    .footer-nav i {
+      font-size: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .content {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .event-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .content {
+        max-width: 1000px;
+      }
+
+      .event-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer-nav a {
+        font-size: 0.7rem;
+      }
+
+      .footer-nav i {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/storage/emulated/0/logo/cmritlogo.png" class="cmritlogo" alt="CMRIT Logo" />
+    <canvas id="clubNameCanvas" class="club-name-canvas"></canvas>
+    <div class="header-right">
+      <button id="langBtn" aria-label="Toggle Language">ಕ</button>
+      <img src="/storage/emulated/0/logo/clublogo.png" alt="Club Logo" class="clublogo" />
+    </div>
+  </header>
+  
+  <!-- Carousel Section -->
+  <section class="carousel">
+    <ol class="viewport" tabindex="1">
+      <li class="slide">
+        <div class="snapper" style="background-image: url('https://picsum.photos/id/1015/600/400');" aria-label="Event 1"></div>
+      </li>
+      <li class="slide">
+        <div class="snapper" style="background-image: url('https://picsum.photos/id/1016/600/400');" aria-label="Event 2"></div>
+      </li>
+      <li class="slide">
+        <div class="snapper" style="background-image: url('https://picsum.photos/id/1018/600/400');" aria-label="Event 3"></div>
+      </li>
+      <li class="slide">
+        <div class="snapper" style="background-image: url('https://picsum.photos/id/1020/600/400');" aria-label="Event 4"></div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- Event Section -->
+  <div class="content">
+    <div class="section">
+      <div class="section-title">
+        <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
+      </div>
+      <div class="event-preview">
+        <a href="events.html" class="card">
+          <img src="images/event2.webp" alt="Event 2" loading="lazy" />
+          <div class="card-content">
+            <div class="card-title" data-en="Student Orientation Program" data-kn="ವಿದ್ಯಾರ್ಥಿ ದೃಷ್ಟಿಕೋನ ಕಾರ್ಯಕ್ರಮ">Student Orientation Program</div>
+            <p data-en="May 21, 2025" data-kn="ಮೇ 21, 2025">Dec 15, 2025</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fas fa-camera"></i> <span data-en="Gallery Highlights" data-kn="ಗ್ಯಾಲರಿ ಮುಖ್ಯಾಂಶಗಳು">Gallery Highlights</span>
+      </div>
+      <div class="category-list">
+        <a href="gallery.html" class="category-card">
+          <img src="images/gallery1.webp" alt="Image 1" loading="lazy" />
+          <div data-en="Cultura-25" data-kn="ಕಲ್ಚುರ-25">Cultura-25</div>
+        </a>
+        <a href="gallery.html" class="category-card">
+          <img src="/storage/emulated/0/Pictures/Canva/Bid samara_20250517_151608_0000.jpg" alt="Image 2" loading="lazy" />
+          <div data-en="Bid samara" data-kn="ಬಿಡ್ ಸಮರ">Event Moments</div>
+        </a>
+        <a href="gallery.html" class="category-card">
+          <img src="images/gallery3.webp" alt="Image 3" loading="lazy" />
+          <div data-en="Team Bonding" data-kn="ತಂಡದ ಬಾಂಧವ್ಯ">Team Bonding</div>
+        </a>
+        <a href="gallery.html" class="category-card">
+          <img src="images/gallery3.webp" alt="Image 4" loading="lazy" />
+          <div data-en="Team Bonding" data-kn="ತಂಡದ ಬಾಂಧವ್ಯ">Team Bonding</div>
+        </a>
+        <a href="gallery.html" class="category-card">
+          <img src="images/gallery3.webp" alt="Image 5" loading="lazy" />
+          <div data-en="Team Bonding" data-kn="ತಂಡದ ಬಾಂಧವ್ಯ">Team Bonding</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Join Us Section -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fas fa-handshake"></i> <span data-en="Join Us" data-kn="ನಮ್ಮೊಂದಿಗೆ ಸೇರಿ">Join Us</span>
+      </div>
+      <div class="social">
+        <a href="https://www.youtube.com/@samskruthikannadasanghacmrit"><i class="fa-brands fa-youtube"></i> <span data-en="Youtube" data-kn="ಯೂಟ್ಯೂಬ್">Youtube</span></a>
+        <a href="https://www.instagram.com/prashant.meni"><i class="fa-brands fa-instagram"></i> <span data-en="Instagram" data-kn="ಇನ್ಸ್ಟಾಗ್ರಾಮ್">Instagram</span></a>
+      </div>
+      <p data-en="Want to be part of our team? Reach out to us and be a part of the culture celebration!" data-kn="ನಮ್ಮ ತಂಡದ ಭಾಗವಾಗಲು ಬಯಸುವಿರಾ? ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ಆಚರಣೆಯ ಭಾಗವಾಗಿ!">Want to be part of our team? Reach out to us and be a part of the culture celebration!</p>
+    </div>
+  </div>
+
+  <footer id="footer">
+    <div class="footer-nav">
+      <a href="index.html" aria-label="Home"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
+      <a href="gallery.html" aria-label="Gallery"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
+      <a href="events.html" aria-label="Events"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
+      <a href="about.html" aria-label="About"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
+    </div>
+  </footer>
+
+  <script>
+    // Canvas Animation for Club Name
+    const canvas = document.getElementById("clubNameCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+
+    function resizeCanvas() {
+      width = canvas.parentElement.clientWidth - 120;
+      height = 40;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const text = "ಸಂಸ್ಕೃತಿ ಕನ್ನಡ ಸಂಘ";
+    const fontSize = 22;
+    let alpha = 0;
+    let scale = 1;
+    let time = 0;
+
+    function animateText() {
+      ctx.clearRect(0, 0, width, height);
+      time += 0.05;
+
+      ctx.font = `${fontSize}px 'Noto Sans Kannada', sans-serif`;
+      const textWidth = ctx.measureText(text).width;
+      const x = (width - textWidth) / 2;
+      const y = height / 2 + 8;
+
+      alpha = Math.min(alpha + 0.02, 1);
+      scale = 1 + Math.sin(time) * 0.05;
+
+      const gradient = ctx.createLinearGradient(x, 0, x + textWidth, 0);
+      gradient.addColorStop(0, "#1976d2");
+      gradient.addColorStop(0.5, "#42a5f5");
+      gradient.addColorStop(1, "#1976d2");
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = alpha;
+
+      ctx.save();
+      ctx.translate(x + textWidth / 2, y);
+      ctx.scale(scale, scale);
+      ctx.translate(-(x + textWidth / 2), -y);
+      ctx.fillText(text, x, y);
+      ctx.restore();
+
+      if (time > 2 * Math.PI) {
+        time = 0;
+        alpha = 0;
+      }
+
+      requestAnimationFrame(animateText);
+    }
+
+    animateText();
+
+    // Language Toggle
+    const langBtn = document.getElementById("langBtn");
+    let currentLang = localStorage.getItem("preferredLang") || "kn";
+
+    function updateLanguage(lang) {
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+      langBtn.textContent = lang === "kn" ? "ಕ" : "E";
+      document.documentElement.lang = lang;
+      localStorage.setItem("preferredLang", lang);
+    }
+
+    langBtn.addEventListener("click", () => {
+      currentLang = currentLang === "kn" ? "en" : "kn";
+      updateLanguage(currentLang);
+    });
+
+    updateLanguage(currentLang);
+
+    // Active Nav Highlight
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    document.querySelectorAll(".footer-nav a").forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+
+    // Footer Scroll Hide/Show
+    let lastScroll = 0;
+    const footer = document.getElementById("footer");
+
+    window.addEventListener("scroll", () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentScroll > lastScroll) {
+        // Scrolling down
+        footer.classList.add("hidden");
+      } else {
+        // Scrolling up
+        footer.classList.remove("hidden");
+      }
+
+      lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+    });
+  </script>
+</body>
+</html>
