@@ -71,86 +71,39 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    /* Carousel Styles */
-    :root {
-      --color-bg: #f5f7fa;
+    /* Carousel Section */
+    .carousel-section {
+      margin-top:0;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
     }
 
     .carousel {
-      position: relative;
       width: 100%;
-      height: 50vw;
-      min-height: 300px;
-      max-height: 400px;
-      margin: 20px 0;
-      perspective: 100px;
+      max-width: device-width;
+      height: 350px;
       overflow: hidden;
-      cursor: grab;
-      z-index: 1;
-    }
-
-    .carousel:active {
-      cursor: grabbing;
-    }
-
-    .viewport {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      display: flex;
-      overflow-x: scroll;
-      counter-reset: item;
-      scroll-behavior: smooth;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-x;
-      scrollbar-width: none;
-    }
-
-    .viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .carousel::before,
-    .carousel::after {
-      content: "";
-      position: absolute;
-      z-index: 2;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 500%;
-      height: 500%;
-      border-radius: 10%;
-      background: var(--color-bg);
-    }
-
-    .carousel::before {
-      top: -480%;
-    }
-
-    .carousel::after {
-      bottom: -480%;
-    }
-
-    .slide {
       position: relative;
-      flex: 0 0 100%;
-      width: 100%;
-      counter-increment: item;
+      border-radius: 10px;
+      background: #000;
     }
 
-    .snapper {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s ease;
+    }
+
+    .carousel-slide {
+      min-width: 100%;
+      user-select: none;
+    }
+
+    .carousel-slide img {
       width: 100%;
       height: 100%;
-      scroll-snap-align: center;
-      background-size: cover;
-      background-position: center;
-      border: 10px solid var(--color-bg);
+      object-fit: cover;
+      border-radius: 10px;
     }
 
     /* Content */
@@ -216,22 +169,6 @@
       color: #fff;
     }
 
-    @media (max-width: 600px) {
-      .social {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .social a {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    .section-title i {
-      font-size: 1.3rem;
-    }
-
     /* Horizontal Scroll for Categories */
     .category-list {
       display: flex;
@@ -250,22 +187,37 @@
       border-radius: 15px;
       padding: 10px;
       text-align: center;
-      min-width: 250px;
-      height
+      min-width: 300px;
+      height: 280px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .category-card img {
       width: 100%;
-      height:100px;
+      height: 220px;
       object-fit: cover;
       border-radius: 10px;
-      margin-bottom: 5px;
     }
 
     .category-card:hover {
       transform: scale(1.05);
+    }
+
+    .category-card div {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1976d2;
+      margin-top: 8px;
+      text-decoration: none;
+      font-family: 'Noto Sans Kannada', sans-serif;
+    }
+
+    body[lang="en"] .category-card div {
+      font-family: 'Poppins', sans-serif;
     }
 
     /* Event and Gallery Cards */
@@ -313,11 +265,18 @@
     .card p {
       font-size: 0.85rem;
       color: #666;
-      text-align:center;
+      text-align: center;
+    }
+
+    /* No Events Message */
+    .no-events {
+      text-align: center;
+      color: #666;
+      font-size: 1rem;
     }
 
     /* Footer */
-   footer {
+    footer {
       position: fixed;
       bottom: 0;
       width: 100%;
@@ -359,7 +318,34 @@
       font-size: 1.5rem;
     }
 
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+      .carousel-section {
+        margin-top: 60px;
+        padding: 10px;
+      }
+
+      .carousel {
+        max-width: 100%;
+        height: 250px;
+      }
+
+      .social {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .social a {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
     @media (min-width: 768px) {
+      .carousel-section {
+        margin-top: 80px;
+      }
+
       .content {
         max-width: 700px;
         margin: 0 auto;
@@ -401,42 +387,62 @@
       <img src="Images/clublogo.png" alt="Club Logo" class="clublogo" />
     </div>
   </header>
-  
+  </br>
+
   <!-- Carousel Section -->
-  <section class="carousel">
-    <ol class="viewport" tabindex="1">
-      <li class="slide">
-        <div class="snapper" style="background-image: url('https://picsum.photos/id/1015/600/400');" aria-label="Event 1"></div>
-      </li>
-      <li class="slide">
-        <div class="snapper" style="background-image: url('https://picsum.photos/id/1016/600/400');" aria-label="Event 2"></div>
-      </li>
-      <li class="slide">
-        <div class="snapper" style="background-image: url('https://picsum.photos/id/1018/600/400');" aria-label="Event 3"></div>
-      </li>
-      <li class="slide">
-        <div class="snapper" style="background-image: url('https://picsum.photos/id/1020/600/400');" aria-label="Event 4"></div>
-      </li>
-    </ol>
+  <section class="carousel-section">
+    <div class="carousel" id="carousel">
+      <div class="carousel-track" id="track">
+        <div class="carousel-slide">
+          <img src="Images/img1.jpg" alt="Slide 1" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img2.JPG" alt="Slide 2" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img3.JPG" alt="Slide 3" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img4.JPg" alt="Slide 3" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img5.jpg" alt="Slide 3" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img6.JPG" alt="Slide 3" loading="lazy">
+        </div>
+        <div class="carousel-slide">
+          <img src="Images/img7.jpg" alt="Slide 7" loading="lazy">
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- Event Section 
+  <!-- Content -->
   <div class="content">
+    <!-- Event Section -->
     <div class="section">
       <div class="section-title">
         <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
       </div>
-      <div class="event-preview">
+      <div class="event-preview" id="eventPreview">
+        <!-- Events will be dynamically populated or show fallback -->
+        <!-- Example event (commented out) -->
+        <!--
         <a href="events.html" class="card">
           <img src="images/event2.webp" alt="Event 2" loading="lazy" />
           <div class="card-content">
             <div class="card-title" data-en="Student Orientation Program" data-kn="ವಿದ್ಯಾರ್ಥಿ ದೃಷ್ಟಿಕೋನ ಕಾರ್ಯಕ್ರಮ">Student Orientation Program</div>
-            <p data-en="May 21, 2025" data-kn="ಮೇ 21, 2025">Dec 15, 2025</p>
+            <p data-en="May 21, 2025" data-kn="ಮೇ 21, 2025">May 21, 2025</p>
           </div>
         </a>
+        -->
+      </div>
+      <div class="no-events" id="noEventsMessage">
+        <p data-en="Next event will come soon!" data-kn="ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!">Next event will come soon!</p>
       </div>
     </div>
--->
+
     <!-- Gallery Section -->
     <div class="section">
       <div class="section-title">
@@ -444,16 +450,12 @@
       </div>
       <div class="category-list">
         <a href="gallery.html" class="category-card">
-          <img src="images/gallery1.webp" alt="Image 1" loading="lazy" />
-          <div data-en="Cultura-25" data-kn="ಕಲ್ಚುರ-25">Cultura-25</div>
-        </a>
-        <a href="gallery.html" class="category-card">
           <img src="Images/bidsamara1.jpg" alt="Image 2" loading="lazy" />
-          <div data-en="Bid samara" data-kn="ಬಿಡ್ ಸಮರ">Bid Samara</div>
+          <div data-en="Bid samara" data-kn="ಬಿಡ್ ಸಮರ">bid samara</div>
         </a>
         <a href="gallery.html" class="category-card">
-          <img src="Images/jagruti1.png" alt="Image 3" loading="lazy" />
-          <div data-en="Jagruti 3.0" data-kn="ಜಾಗೃತಿ 3.0">jagruti</div>
+          <img src="images/sangama1.png" alt="Image 3" loading="lazy" />
+          <div data-en="Sangama" data-kn="ಸಂಗಮ">sangama</div>
         </a>
       </div>
     </div>
@@ -465,7 +467,7 @@
       </div>
       <div class="social">
         <a href="https://www.youtube.com/@samskruthikannadasanghacmrit"><i class="fa-brands fa-youtube"></i> <span data-en="Youtube" data-kn="ಯೂಟ್ಯೂಬ್">Youtube</span></a>
-        <a href="https://www.instagram.com/samskruthiclub_cmrit"><i class="fa-brands fa-instagram"></i> <span data-en="Instagram" data-kn="ಇನ್ಸ್ಟಾಗ್ರಾಮ್">Instagram</span></a>
+        <a href="https://www.instagram.com/prashant.meni"><i class="fa-brands fa-instagram"></i> <span data-en="Instagram" data-kn="ಇನ್ಸ್ಟಾಗ್ರಾಮ್">Instagram</span></a>
       </div>
       <p data-en="Want to be part of our team? Reach out to us and be a part of the culture celebration!" data-kn="ನಮ್ಮ ತಂಡದ ಭಾಗವಾಗಲು ಬಯಸುವಿರಾ? ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ಆಚರಣೆಯ ಭಾಗವಾಗಿ!">Want to be part of our team? Reach out to us and be a part of the culture celebration!</p>
     </div>
@@ -549,6 +551,7 @@
       langBtn.textContent = lang === "kn" ? "ಕ" : "E";
       document.documentElement.lang = lang;
       localStorage.setItem("preferredLang", lang);
+      updateEventSection(); // Update event section on language change
     }
 
     langBtn.addEventListener("click", () => {
@@ -557,6 +560,69 @@
     });
 
     updateLanguage(currentLang);
+
+    // Check for events and show/hide "No Events" message
+    function updateEventSection() {
+      const eventPreview = document.getElementById("eventPreview");
+      const noEventsMessage = document.getElementById("noEventsMessage");
+
+      if (eventPreview.children.length === 0) {
+        noEventsMessage.style.display = "block";
+      } else {
+        noEventsMessage.style.display = "none";
+      }
+    }
+
+    // Run on page load
+    updateEventSection();
+
+    // Carousel Functionality
+    const track = document.getElementById('track');
+    const slides = document.querySelectorAll('.carousel-slide');
+    let index = 0;
+    const totalSlides = slides.length;
+
+    let startX = 0;
+    let isDragging = false;
+
+    const updateCarousel = () => {
+      track.style.transform = `translateX(-${index * 100}%)`;
+    };
+
+    const startDrag = (e) => {
+      isDragging = true;
+      startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    };
+
+    const endDrag = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const endX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+      const diff = endX - startX;
+
+      if (diff > 50 && index > 0) {
+        index--;
+      } else if (diff < -50 && index < totalSlides - 1) {
+        index++;
+      }
+
+      updateCarousel();
+    };
+
+    // Auto-slide every 5 seconds
+    let autoSlide = setInterval(() => {
+      index = (index + 1) % totalSlides;
+      updateCarousel();
+    }, 5000);
+
+    // Pause auto-slide on user interaction
+    const carousel = document.getElementById('carousel');
+    carousel.addEventListener('mousedown', () => clearInterval(autoSlide));
+    carousel.addEventListener('touchstart', () => clearInterval(autoSlide));
+    carousel.addEventListener('mousedown', startDrag);
+    carousel.addEventListener('mouseup', endDrag);
+    carousel.addEventListener('touchstart', startDrag);
+    carousel.addEventListener('touchend', endDrag);
 
     // Active Nav Highlight
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -574,10 +640,8 @@
       const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
       if (currentScroll > lastScroll) {
-        // Scrolling down
         footer.classList.add("hidden");
       } else {
-        // Scrolling up
         footer.classList.remove("hidden");
       }
 
