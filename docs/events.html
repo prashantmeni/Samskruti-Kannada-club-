@@ -305,7 +305,7 @@
     <div class="section">
       <div class="section-title">
         <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
-      </div>
+   <!--   </div>
       <div class="event-list">
         <div class="event-card">
           <img src="/storage/emulated/0/Pictures/Canva/Green_and_White_Modern_Internship_Program_Instagram_Post_20250519_125045_0000.png" alt="Student Orientation" loading="lazy" />
@@ -315,7 +315,7 @@
             <a href="https://forms.gle/EXAMPLE" class="register-btn" data-en="Register for Event" data-kn="ಕಾರ್ಯಕ್ರಮಕ್ಕೆ ನೋಂದಾಯಿಸಿ">Register for Event</a>
           </div>
         </div>
-      </div>
+      </div>-->
 
       <div class="certificate-section">
         <div class="section-title">
@@ -423,6 +423,21 @@
     });
 
     updateLanguage(currentLang);
+
+    // Check for events and show/hide "No Events" message
+    function updateEventSection() {
+      const eventPreview = document.getElementById("eventPreview");
+      const noEventsMessage = document.getElementById("noEventsMessage");
+
+      if (eventPreview.children.length === 0) {
+        noEventsMessage.style.display = "block";
+      } else {
+        noEventsMessage.style.display = "none";
+      }
+    }
+
+    // Run on page load
+    updateEventSection();
 
     // Footer Navigation Highlight
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
