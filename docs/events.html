@@ -491,7 +491,7 @@
     async function fetchCSVWithRetry(maxRetries = 3, delay = 1000) {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const csvUrl = `https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants%20(1).csv?v=${Date.now()}`;
+          const csvUrl = `https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants(1).csv?v=${Date.now()}`;
           const response = await fetch(csvUrl, {
             method: "GET",
             headers: {
