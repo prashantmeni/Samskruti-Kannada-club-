@@ -6,7 +6,8 @@
   <title>Samskruthi Kannada Sangha - Events</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -296,7 +297,7 @@
     <img src="Images/cmritlogo.png" class="cmritlogo" alt="CMRIT Logo" />
     <canvas id="clubNameCanvas" class="club-name-canvas"></canvas>
     <div class="header-right">
-      <button id="langBtn" aria-label="Toggle Language">ಕ</button>
+      <button id="langBtn" aria-label="Toggle between English and Kannada">ಕ</button>
       <img src="Images/clublogo.png" alt="Club Logo" class="clublogo" />
     </div>
   </header>
@@ -305,17 +306,20 @@
     <div class="section">
       <div class="section-title">
         <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
-   <!--   </div>
-      <div class="event-list">
-        <div class="event-card">
-          <img src="/storage/emulated/0/Pictures/Canva/Green_and_White_Modern_Internship_Program_Instagram_Post_20250519_125045_0000.png" alt="Student Orientation" loading="lazy" />
+      </div>
+      <div id="eventPreview" class="event-list">
+        <!--<div class="event-card">
+          <img src="https://via.placeholder.com/120x80" alt="Student Orientation" loading="lazy" />
           <div class="event-content">
             <div class="event-title">Student Orientation</div>
             <p data-en="May 20, 2025" data-kn="ಮೇ 20, 2025">May 20, 2025</p>
             <a href="https://forms.gle/EXAMPLE" class="register-btn" data-en="Register for Event" data-kn="ಕಾರ್ಯಕ್ರಮಕ್ಕೆ ನೋಂದಾಯಿಸಿ">Register for Event</a>
           </div>
-        </div>
-      </div>-->
+        </div>-->
+      </div>
+      <p id="noEventsMessage" class="error-message" data-en="Next event will come soon!" data-kn="ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!." style="display: none;">
+        No upcoming events available.
+      </p>
 
       <div class="certificate-section">
         <div class="section-title">
@@ -324,14 +328,14 @@
         <p id="error-message" class="error-message"></p>
         <form id="certificate-form" class="certificate-form">
           <div>
-            <label for="name" data-en="Full Name" data-kn="ಪೂರ್ಣ ಹೆಸರು">Full Name / ಪೂರ್ಣ ಹೆಸರು</label>
+            <label for="name"><span data-en="Full Name" data-kn="ಪೂರ್ಣ ಹೆಸರು">Full Name</span></label>
             <input type="text" id="name" name="name" required>
           </div>
           <div>
-            <label for="usn" data-en="USN" data-kn="ಯುಎಸ್‌ಎನ್">USN / ಯುಎಸ್‌ಎನ್</label>
+            <label for="usn"><span data-en="USN" data-kn="ಯುಎಸ್‌ಎನ್">USN</span></label>
             <input type="text" id="usn" name="usn" required>
           </div>
-          <button type="submit" data-en="Generate Certificate" data-kn="ಪ್ರಮಾಣಪತ್ರ ರಚಿಸಿ">Generate Certificate / ಪ್ರಮಾಣಪತ್ರ ರಚಿಸಿ</button>
+          <button type="submit"><span data-en="Generate Certificate" data-kn="ಪ್ರಮಾಣಪತ್ರ ರಚಿಸಿ">Generate Certificate</span></button>
         </form>
       </div>
     </div>
@@ -339,10 +343,10 @@
 
   <footer id="footer">
     <div class="footer-nav">
-      <a href="index.html" aria-label="Home"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
-      <a href="gallery.html" aria-label="Gallery"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
-      <a href="events.html" aria-label="Events"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
-      <a href="about.html" aria-label="About"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
+      <a href="index.html" aria-label="Go to Home page"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
+      <a href="gallery.html" aria-label="Go to Gallery page"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
+      <a href="events.html" class="active" aria-label="Go to Events page"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
+      <a href="about.html" aria-label="Go to About page"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
     </div>
   </footer>
 
@@ -369,6 +373,11 @@
     let time = 0;
 
     function animateText() {
+      if (document.visibilityState === "hidden") {
+        requestAnimationFrame(animateText);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
       time += 0.05;
 
@@ -436,7 +445,6 @@
       }
     }
 
-    // Run on page load
     updateEventSection();
 
     // Footer Navigation Highlight
@@ -465,6 +473,21 @@
     const participants = [];
     const errorMessage = document.getElementById("error-message");
 
+    async function loadFont() {
+      const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/NotoSansKannada-Regular.ttf";
+      try {
+        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.addFileToVFS("NotoSansKannada-Regular.ttf", fontBytes);
+        doc.addFont("NotoSansKannada-Regular.ttf", "NotoSansKannada", "normal");
+      } catch (error) {
+        console.error("Failed to load font:", error);
+      }
+    }
+
+    loadFont();
+
     async function fetchCSVWithRetry(maxRetries = 3, delay = 1000) {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
@@ -482,13 +505,20 @@
 
           const data = await response.text();
           console.log("Raw CSV data:", data);
-          const lines = data.split(/\r?\n/).filter(line => line.trim() !== "");
-          console.log("Parsed CSV lines:", lines);
-          lines.forEach((line, index) => {
-            if (index === 0) return; // Skip header
-            const [name, usn] = line.split(",").map(item => item.trim());
-            if (name && usn) {
-              participants.push({ name: name.toLowerCase(), usn: usn.toUpperCase().trim() });
+          
+          const parsed = Papa.parse(data, {
+            header: true,
+            skipEmptyLines: true,
+            transform: value => value.trim(),
+          });
+
+          participants.length = 0;
+          parsed.data.forEach(row => {
+            if (row.name && row.usn) {
+              participants.push({
+                name: row.name.toLowerCase(),
+                usn: row.usn.toUpperCase().trim(),
+              });
             }
           });
           console.log("Participants loaded:", participants);
@@ -510,13 +540,15 @@
 
     fetchCSVWithRetry();
 
-    // Function to load the certificate template image
     async function loadImage(url) {
       return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = "Anonymous"; // Handle CORS if needed
+        img.crossOrigin = "Anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+        img.onerror = () => {
+          console.error(`Failed to load image from ${url}`);
+          reject(new Error("Failed to load certificate template image."));
+        };
         img.src = url;
       });
     }
@@ -544,57 +576,54 @@
         return;
       }
 
-      // Generate Certificate with Template
       try {
         if (!window.jspdf || !window.jspdf.jsPDF) {
           throw new Error("jsPDF library not loaded");
         }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({
-          orientation: "landscape", // Assuming landscape orientation; change to "portrait" if needed
+          orientation: "landscape",
           unit: "mm",
           format: "a4",
         });
 
-        // Load the certificate template image
         const templateUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/certificate.png";
         const img = await loadImage(templateUrl);
-
-        // Add the image to the PDF (fit to A4 landscape dimensions: 297mm x 210mm)
         doc.addImage(img, "PNG", 0, 0, 297, 210);
 
-        // Overlay dynamic text on the template
-        // Adjust the coordinates (x, y) and font sizes based on your template's placeholders
-        doc.setFont("helvetica", "bold");
-        
-        // Name (centered, adjust y-coordinate as needed)
-        doc.setFontSize(24);
-        doc.setTextColor(0, 0, 0); // Black text
-        doc.text(
-        currentLang === "kn" ? `ಯುಎಸ್‌ಎನ್: ${nameInput}` : `name: ${nameInput}`,
-        148.5, 
-        90, 
-        { align: "center" }); // Center of A4 landscape (148.5mm), 90mm from top
+        const textConfig = {
+          name: { x: 148.5, y: 90, size: 24, align: "center" },
+          usn: { x: 148.5, y: 110, size: 16, align: "center" },
+          date: { x: 148.5, y: 130, size: 14, align: "center" },
+        };
 
-        // USN (centered, below the name)
-        doc.setFontSize(16);
+        doc.setFont(currentLang === "kn" ? "NotoSansKannada" : "helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+
+        doc.setFontSize(textConfig.name.size);
+        doc.text(
+          nameInput,
+          textConfig.name.x,
+          textConfig.name.y,
+          { align: textConfig.name.align }
+        );
+
+        doc.setFontSize(textConfig.usn.size);
         doc.text(
           currentLang === "kn" ? `ಯುಎಸ್‌ಎನ್: ${usnInput}` : `USN: ${usnInput}`,
-          148.5,
-          110,
-          { align: "center" }
+          textConfig.usn.x,
+          textConfig.usn.y,
+          { align: textConfig.usn.align }
         );
 
-        // Date (centered, below the USN)
-        doc.setFontSize(14);
+        doc.setFontSize(textConfig.date.size);
         doc.text(
           currentLang === "kn" ? "ದಿನಾಂಕ: ನವೆಂಬರ್ 1, 2025" : "Date: November 1, 2025",
-          148.5,
-          130,
-          { align: "center" }
+          textConfig.date.x,
+          textConfig.date.y,
+          { align: textConfig.date.align }
         );
 
-        // Save the PDF
         doc.save(`certificate_${nameInput}.pdf`);
         console.log("Certificate generated successfully for:", nameInput, usnInput);
       } catch (error) {
