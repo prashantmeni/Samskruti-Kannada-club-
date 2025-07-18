@@ -139,7 +139,7 @@
   content: url('Images/fallback.jpg'); /* Fallback image */
 }
 
-     .contact-form {
+    .contact-form {
     max-width: 700px;
     margin: 20px auto;
     padding: 20px;
@@ -522,7 +522,7 @@
       <a href="about.html" aria-label="About"><i class="fas fa-user"></i>About</a>
     </div>
   </footer>
-
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     // Club Name Canvas Animation
     const canvas = document.getElementById("clubNameCanvas");
@@ -601,7 +601,10 @@
 
     updateLanguage(currentLang);
 
-    // Update form placeholders based on language
+   // Initialize EmailJS with your User ID
+  emailjs.init("YOUR_EMAILJS_USER_ID");
+
+  // Update form placeholders based on language
   function updateFormPlaceholders(lang) {
     document.querySelectorAll('.contact-form input, .contact-form textarea').forEach(el => {
       const placeholder = el.getAttribute(`data-${lang}-placeholder`) || el.getAttribute('data-en-placeholder');
@@ -619,15 +622,39 @@
   // Initial placeholder update
   updateFormPlaceholders(document.documentElement.lang || "kn");
 
-  // Form submission handling with clear on success
-  document.getElementById("contactForm").addEventListener("submit", (e) => {
+  // Form submission handling with email sending and form clearing
+  document.getElementById("contactForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    // Simulate successful submission (replace with actual logic)
-    alert("Form submitted successfully!");
-    // Clear the form
-    e.target.reset();
-    // Ensure placeholders are updated after reset to match current language
-    updateFormPlaceholders(document.documentElement.lang || "kn");
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      subject: formData.get("subject"),
+      message: formData.get("message")
+    };
+
+    try {
+      // Send feedback email to the user
+      await emailjs.send("YOUR_EMAILJS_SERVICE_ID", "YOUR_EMAILJS_TEMPLATE_ID", {
+        to_name: data.name,
+        to_email: data.email,
+        subject: data.subject,
+        message: data.message
+      });
+
+      // Simulate sending form data to your server (optional)
+      // For example, you could also send the form data to your own server or another service
+      alert("Message sent successfully! A confirmation email has been sent to your email address.");
+      
+      // Clear the form
+      form.reset();
+      // Update placeholders after reset to match current language
+      updateFormPlaceholders(document.documentElement.lang || "kn");
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      alert("Failed to send message. Please try again later.");
+    }
   });
     // Active Footer Nav Highlight
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
