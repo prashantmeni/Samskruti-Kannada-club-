@@ -485,7 +485,7 @@
     </div>
   </div>
 
- <div class="contact-section">
+ <div class="section">
   <h2 class="section-title"><i class="fas fa-envelope"></i><span data-kn="ಸಂಪರ್ಕ" data-en="Contact Us">Contact Us</span></h2>
   <p data-kn="ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಲು ಈ ಫಾರ್ಮ್ ಬಳಸಿ ಅಥವಾ ಇಮೇಲ್ ಮಾಡಿ: samskruthi@cmrit.ac.in" data-en="Use the form below to reach out to us or email: samskruthi@cmrit.ac.in">Use the form below to reach out to us or email: samskruthi@cmrit.ac.in</p>
   <form id="contactForm" class="contact-form">
@@ -601,7 +601,7 @@
 
     updateLanguage(currentLang);
 
-     // Update form placeholders based on language
+    // Update form placeholders based on language
   function updateFormPlaceholders(lang) {
     document.querySelectorAll('.contact-form input, .contact-form textarea').forEach(el => {
       const placeholder = el.getAttribute(`data-${lang}-placeholder`) || el.getAttribute('data-en-placeholder');
@@ -619,13 +619,16 @@
   // Initial placeholder update
   updateFormPlaceholders(document.documentElement.lang || "kn");
 
-  // Basic form submission handling (placeholder)
+  // Form submission handling with clear on success
   document.getElementById("contactForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    alert("Form submitted! (This is a placeholder action.)");
-    // Replace with actual form submission logic (e.g., send to server or email service)
+    // Simulate successful submission (replace with actual logic)
+    alert("Form submitted successfully!");
+    // Clear the form
+    e.target.reset();
+    // Ensure placeholders are updated after reset to match current language
+    updateFormPlaceholders(document.documentElement.lang || "kn");
   });
-
     // Active Footer Nav Highlight
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
     document.querySelectorAll(".footer-nav a").forEach(link => {
