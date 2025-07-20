@@ -470,29 +470,30 @@
     let isInitialized = false;
 
     async function loadFont() {
-      const fontUrl = "https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/1390d89e9dff16f7797ddf6336599a27657576e3/Nudi%2017%20e%20Regular.ttf";
+      const fontUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
       try {
+        console.log("Fetching font...");
         const fontBytes = await fetch(fontUrl).then(res => {
           if (!res.ok) throw new Error(`Failed to fetch font: ${res.status}`);
           return res.arrayBuffer();
         });
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.addFileToVFS("NotoSansKannada-Regular.ttf", fontBytes);
-        doc.addFont("NotoSansKannada-Regular.ttf", "NotoSansKannada", "normal");
+        doc.addFileToVFS("Nudi17eRegular.ttf", fontBytes);
+        doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
         console.log("Font loaded successfully");
+        return true;
       } catch (error) {
-        console.error("Failed to load font:", error);
-        // Fallback to default font
+        console.error("Failed to load font, using fallback font (Helvetica):", error);
         return false;
       }
-      return true;
     }
 
-    async function fetchCSVWithRetry(maxRetries = 3, delay = 1000) {
-      const csvUrl = "https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/8a91839c052b5b0464c60f7cfd530c3d48efe651/participants.csv";
+    async function fetchCSVWithRetry(maxRetries = 5, delay = 2000) {
+      const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
+          console.log(`Fetching CSV, attempt ${attempt}...`);
           const response = await fetch(csvUrl, {
             method: "GET",
             headers: {
@@ -526,26 +527,36 @@
               });
             }
           });
+
+          if (participants.length === 0) {
+            throw new Error("No valid participants found in CSV");
+          }
+
           console.log("Participants loaded:", participants);
-          return;
+          localStorage.setItem("participants", JSON.stringify(participants));
+          return true;
         } catch (error) {
           console.error(`Attempt ${attempt} failed:`, error);
           if (attempt === maxRetries) {
-            errorMessage.textContent =
-              currentLang === "kn"
-                ? "CSV ಫೈಲ್ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
-                : "Failed to load CSV file. Please try again later.";
-            errorMessage.style.display = "block";
-            throw error;
+            console.warn("Using fallback participant data");
+            participants.length = 0;
+            participants.push(
+              { name: "john doe", usn: "1CM21CS123" },
+              { name: "jane smith", usn: "1CM21CS124" }
+            );
+            console.log("Fallback participants loaded:", participants);
+            localStorage.setItem("participants", JSON.stringify(participants));
+            return false;
           }
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }
 
-    async function loadImage(url, maxRetries = 3, delay = 1000) {
+    async function loadImage(url, maxRetries = 5, delay = 2000) {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
+          console.log(`Loading image, attempt ${attempt}...`);
           const img = new Image();
           img.crossOrigin = "Anonymous";
           return await new Promise((resolve, reject) => {
@@ -565,15 +576,32 @@
       try {
         loadingMessage.style.display = "block";
         errorMessage.style.display = "none";
-        await Promise.all([loadFont(), fetchCSVWithRetry()]);
+
+        // Check cached participants
+        const cachedParticipants = localStorage.getItem("participants");
+        if (cachedParticipants) {
+          participants.push(...JSON.parse(cachedParticipants));
+          console.log("Loaded participants from cache:", participants);
+          isInitialized = true;
+          return;
+        }
+
+        const [fontLoaded, csvLoaded] = await Promise.all([loadFont(), fetchCSVWithRetry()]);
         isInitialized = true;
-        console.log("Initialization complete");
+        console.log("Initialization complete", { fontLoaded, csvLoaded });
+        if (!csvLoaded) {
+          errorMessage.textContent =
+            currentLang === "kn"
+              ? "CSV ಲೋಡ್ ಆಗಲಿಲ್ಲ, ಆದರೆ ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ."
+              : "CSV failed to load, using fallback data.";
+          errorMessage.style.display = "block";
+        }
       } catch (error) {
         console.error("Initialization failed:", error);
         errorMessage.textContent =
           currentLang === "kn"
-            ? "ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
-            : "Failed to load initial data. Please try again.";
+            ? `ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+            : `Failed to load initial data: ${error.message}. Please try again.`;
         errorMessage.style.display = "block";
       } finally {
         loadingMessage.style.display = "none";
@@ -601,6 +629,8 @@
       const usnInput = document.getElementById("usn").value.trim().toUpperCase();
       console.log("Form inputs:", { name: nameInput, usn: usnInput });
 
+      console.log("Available participants:", participants);
+
       const participant = participants.find(p =>
         p.name === nameInput.toLowerCase() && p.usn === usnInput
       );
@@ -609,8 +639,8 @@
       if (!participant) {
         errorMessage.textContent =
           currentLang === "kn"
-            ? "ಹೆಸರು ಅಥವಾ ಯುಎಸ್‌ಎನ್ ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ."
-            : "Participant not found with given name and USN.";
+            ? `ಹೆಸರು "${nameInput}" ಮತ್ತು ಯುಎಸ್‌ಎನ್ "${usnInput}" ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`
+            : `Participant with name "${nameInput}" and USN "${usnInput}" not found. Please check the provided details.`;
         errorMessage.style.display = "block";
         loadingMessage.style.display = "none";
         return;
@@ -637,7 +667,7 @@
           date: { x: 148.5, y: 130, size: 14, align: "center" },
         };
 
-        doc.setFont(currentLang === "kn" ? "NotoSansKannada" : "helvetica", "normal");
+        doc.setFont(currentLang === "kn" ? "Nudi17e" : "helvetica", "normal");
         doc.setTextColor(0, 0, 0);
 
         doc.setFontSize(textConfig.name.size);
@@ -665,8 +695,8 @@
         console.error("Error generating certificate:", error);
         errorMessage.textContent =
           currentLang === "kn"
-            ? "ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ ಸಂಭವಿಸಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
-            : "Error generating certificate. Please try again.";
+            ? `ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+            : `Error generating certificate: ${error.message}. Please try again.`;
         errorMessage.style.display = "block";
       } finally {
         loadingMessage.style.display = "none";
