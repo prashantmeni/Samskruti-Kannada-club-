@@ -490,7 +490,7 @@
     }
 
     async function fetchCSVWithRetry(maxRetries = 3, delay = 1000) {
-      const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/4acfda273ff6f2088861f8150f69c5f4c8c065ac/participants%20(1).csv";
+      const csvUrl = "https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/8a91839c052b5b0464c60f7cfd530c3d48efe651/participants.csv";
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const response = await fetch(csvUrl, {
