@@ -470,7 +470,7 @@
     let isInitialized = false;
 
     async function loadFont() {
-      const fontUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
+      const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
       try {
         console.log("Fetching font...");
         const fontBytes = await fetch(fontUrl).then(res => {
@@ -490,7 +490,7 @@
     }
 
     async function fetchCSVWithRetry(maxRetries = 5, delay = 2000) {
-      const csvUrl = "https://cors-anywhere.herokuapp.com/https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/25751b0bc435555c9e625cec1cd21663bd7d3547/participants.csv";
+      const csvUrl = "https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/25751b0bc435555c9e625cec1cd21663bd7d3547/participants.csv";
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           console.log(`Fetching CSV, attempt ${attempt}...`);
