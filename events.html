@@ -6,7 +6,7 @@
   <title>Samskruthi Kannada Sangha - Events</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Noto+Sans+Kannada:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
     * {
@@ -308,14 +308,7 @@
         <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
       </div>
       <div id="eventPreview" class="event-list">
-        <!--<div class="event-card">
-          <img src="https://via.placeholder.com/120x80" alt="Student Orientation" loading="lazy" />
-          <div class="event-content">
-            <div class="event-title">Student Orientation</div>
-            <p data-en="May 20, 2025" data-kn="ಮೇ 20, 2025">May 20, 2025</p>
-            <a href="https://forms.gle/EXAMPLE" class="register-btn" data-en="Register for Event" data-kn="ಕಾರ್ಯಕ್ರಮಕ್ಕೆ ನೋಂದಾಯಿಸಿ">Register for Event</a>
-          </div>
-        </div>-->
+        <!-- Events will be dynamically added here -->
       </div>
       <p id="noEventsMessage" class="error-message" data-en="Next event will come soon!" data-kn="ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!." style="display: none;">
         No upcoming events available.
@@ -326,6 +319,7 @@
           <i class="fas fa-certificate"></i> <span data-en="Download Your E-Certificate" data-kn="ನಿಮ್ಮ ಇ-ಪ್ರಮಾಣಪತ್ರವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ">Download Your E-Certificate</span>
         </div>
         <p id="error-message" class="error-message"></p>
+        <div id="loading-message" class="error-message" style="display: none;">Loading...</div>
         <form id="certificate-form" class="certificate-form">
           <div>
             <label for="name"><span data-en="Full Name" data-kn="ಪೂರ್ಣ ಹೆಸರು">Full Name</span></label>
@@ -472,26 +466,33 @@
     // Certificate Generation
     const participants = [];
     const errorMessage = document.getElementById("error-message");
+    const loadingMessage = document.getElementById("loading-message");
+    let isInitialized = false;
 
     async function loadFont() {
       const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/NotoSansKannada-Regular.ttf";
       try {
-        const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
+        const fontBytes = await fetch(fontUrl).then(res => {
+          if (!res.ok) throw new Error(`Failed to fetch font: ${res.status}`);
+          return res.arrayBuffer();
+        });
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.addFileToVFS("NotoSansKannada-Regular.ttf", fontBytes);
         doc.addFont("NotoSansKannada-Regular.ttf", "NotoSansKannada", "normal");
+        console.log("Font loaded successfully");
       } catch (error) {
         console.error("Failed to load font:", error);
+        // Fallback to default font
+        return false;
       }
+      return true;
     }
 
-    loadFont();
-
     async function fetchCSVWithRetry(maxRetries = 3, delay = 1000) {
+      const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/4acfda273ff6f2088861f8150f69c5f4c8c065ac/participants%20(1).csv";
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const csvUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/4acfda273ff6f2088861f8150f69c5f4c8c065ac/participants%20(1).csv";
           const response = await fetch(csvUrl, {
             method: "GET",
             headers: {
@@ -505,19 +506,23 @@
 
           const data = await response.text();
           console.log("Raw CSV data:", data);
-          
+
           const parsed = Papa.parse(data, {
             header: true,
             skipEmptyLines: true,
             transform: value => value.trim(),
           });
 
+          if (parsed.errors.length > 0) {
+            throw new Error("CSV parsing errors: " + JSON.stringify(parsed.errors));
+          }
+
           participants.length = 0;
           parsed.data.forEach(row => {
             if (row.name && row.usn) {
               participants.push({
-                name: row.name.toLowerCase(),
-                usn: row.usn.toUpperCase().trim(),
+                name: row.name.trim().toLowerCase(),
+                usn: row.usn.trim().toUpperCase(),
               });
             }
           });
@@ -531,36 +536,70 @@
                 ? "CSV ಫೈಲ್ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
                 : "Failed to load CSV file. Please try again later.";
             errorMessage.style.display = "block";
-          } else {
-            await new Promise(resolve => setTimeout(resolve, delay));
+            throw error;
           }
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }
 
-    fetchCSVWithRetry();
-
-    async function loadImage(url) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = () => resolve(img);
-        img.onerror = () => {
-          console.error(`Failed to load image from ${url}`);
-          reject(new Error("Failed to load certificate template image."));
-        };
-        img.src = url;
-      });
+    async function loadImage(url, maxRetries = 3, delay = 1000) {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          return await new Promise((resolve, reject) => {
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+            img.src = url;
+          });
+        } catch (error) {
+          console.error(`Image load attempt ${attempt} failed:`, error);
+          if (attempt === maxRetries) throw error;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
+
+    async function initialize() {
+      try {
+        loadingMessage.style.display = "block";
+        errorMessage.style.display = "none";
+        await Promise.all([loadFont(), fetchCSVWithRetry()]);
+        isInitialized = true;
+        console.log("Initialization complete");
+      } catch (error) {
+        console.error("Initialization failed:", error);
+        errorMessage.textContent =
+          currentLang === "kn"
+            ? "ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+            : "Failed to load initial data. Please try again.";
+        errorMessage.style.display = "block";
+      } finally {
+        loadingMessage.style.display = "none";
+      }
+    }
+
+    initialize();
 
     document.getElementById("certificate-form").addEventListener("submit", async function (e) {
       e.preventDefault();
       errorMessage.style.display = "none";
+      loadingMessage.style.display = "block";
+
+      if (!isInitialized) {
+        errorMessage.textContent =
+          currentLang === "kn"
+            ? "ದಯವಿಟ್ಟು ಡೇಟಾ ಲೋಡ್ ಆಗುವವರೆಗೆ ಕಾಯಿರಿ."
+            : "Please wait until data is loaded.";
+        errorMessage.style.display = "block";
+        loadingMessage.style.display = "none";
+        return;
+      }
 
       const nameInput = document.getElementById("name").value.trim();
       const usnInput = document.getElementById("usn").value.trim().toUpperCase();
-      console.log("Form inputs after trimming:", { name: nameInput, usn: usnInput });
-      console.log("Processed inputs for comparison:", { name: nameInput.toLowerCase(), usn: usnInput });
+      console.log("Form inputs:", { name: nameInput, usn: usnInput });
 
       const participant = participants.find(p =>
         p.name === nameInput.toLowerCase() && p.usn === usnInput
@@ -573,6 +612,7 @@
             ? "ಹೆಸರು ಅಥವಾ ಯುಎಸ್‌ಎನ್ ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ."
             : "Participant not found with given name and USN.";
         errorMessage.style.display = "block";
+        loadingMessage.style.display = "none";
         return;
       }
 
@@ -587,7 +627,7 @@
           format: "a4",
         });
 
-        const templateUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/certificate.png";
+        const templateUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/certificate.png";
         const img = await loadImage(templateUrl);
         doc.addImage(img, "PNG", 0, 0, 297, 210);
 
@@ -601,12 +641,7 @@
         doc.setTextColor(0, 0, 0);
 
         doc.setFontSize(textConfig.name.size);
-        doc.text(
-          nameInput,
-          textConfig.name.x,
-          textConfig.name.y,
-          { align: textConfig.name.align }
-        );
+        doc.text(nameInput, textConfig.name.x, textConfig.name.y, { align: textConfig.name.align });
 
         doc.setFontSize(textConfig.usn.size);
         doc.text(
@@ -633,6 +668,8 @@
             ? "ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ ಸಂಭವಿಸಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
             : "Error generating certificate. Please try again.";
         errorMessage.style.display = "block";
+      } finally {
+        loadingMessage.style.display = "none";
       }
     });
   </script>
