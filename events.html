@@ -464,244 +464,281 @@
     });
 
     // Certificate Generation
-    const participants = [];
-    const errorMessage = document.getElementById("error-message");
-    const loadingMessage = document.getElementById("loading-message");
-    let isInitialized = false;
+const participants = [];
+const errorMessage = document.getElementById("error-message");
+const loadingMessage = document.getElementById("loading-message");
+let isInitialized = false;
 
-    async function loadFont() {
-      const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
-      try {
-        console.log("Fetching font...");
-        const fontBytes = await fetch(fontUrl).then(res => {
-          if (!res.ok) throw new Error(`Failed to fetch font: ${res.status}`);
-          return res.arrayBuffer();
-        });
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.addFileToVFS("Nudi17eRegular.ttf", fontBytes);
-        doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
-        console.log("Font loaded successfully");
-        return true;
-      } catch (error) {
-        console.error("Failed to load font, using fallback font (Helvetica):", error);
+async function loadFont() {
+  const fontUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
+  try {
+    console.log("Attempting to fetch font...");
+    const fontBytes = await fetch(fontUrl).then(res => {
+      if (!res.ok) throw new Error(`Failed to fetch font: ${res.status} ${res.statusText}`);
+      return res.arrayBuffer();
+    });
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.addFileToVFS("Nudi17eRegular.ttf", fontBytes);
+    doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
+    console.log("Font loaded successfully");
+    return true;
+  } catch (error) {
+    console.error("Failed to load font, using fallback font (Helvetica):", error);
+    return false; // Fallback to Helvetica
+  }
+}
+
+async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
+  const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Fetching CSV, attempt ${attempt}/${maxRetries}...`);
+      const response = await fetch(csvUrl, {
+        method: "GET",
+        headers: {
+          "Accept": "text/csv",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.text();
+      console.log("Raw CSV data:", data);
+
+      const parsed = Papa.parse(data, {
+        header: true,
+        skipEmptyLines: true,
+        transform: value => value.trim(),
+      });
+
+      if (parsed.errors.length > 0) {
+        throw new Error("CSV parsing errors: " + JSON.stringify(parsed.errors));
+      }
+
+      participants.length = 0;
+      parsed.data.forEach(row => {
+        if (row.name && row.usn) {
+          participants.push({
+            name: row.name.trim().toLowerCase(),
+            usn: row.usn.trim().toUpperCase(),
+          });
+        }
+      });
+
+      if (participants.length === 0) {
+        throw new Error("No valid participants found in CSV");
+      }
+
+      console.log("Participants loaded:", participants);
+      localStorage.setItem("participants", JSON.stringify(participants));
+      return true;
+    } catch (error) {
+      console.error(`Attempt ${attempt}/${maxRetries} failed:`, error);
+      if (attempt === maxRetries) {
+        console.warn("Using fallback participant data");
+        participants.length = 0;
+        participants.push(
+          { name: "john doe", usn: "1CM21CS123" },
+          { name: "jane smith", usn: "1CM21CS124" },
+          { name: "prashant", usn: "1CR24EC414" }
+        );
+        console.log("Fallback participants loaded:", participants);
+        localStorage.setItem("participants", JSON.stringify(participants));
         return false;
       }
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+
+async function loadImage(url, maxRetries = 8, delay = 4000) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Loading image, attempt ${attempt}/${maxRetries}...`);
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      return await new Promise((resolve, reject) => {
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+        img.src = url;
+      });
+    } catch (error) {
+      console.error(`Image load attempt ${attempt}/${maxRetries} failed:`, error);
+      if (attempt === maxRetries) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+
+async function initialize() {
+  try {
+    loadingMessage.style.display = "block";
+    errorMessage.style.display = "none";
+
+    // Clear cache to force fresh fetch
+    localStorage.removeItem("participants");
+
+    // Check cached participants
+    const cachedData = localStorage.getItem("participants");
+    if (cachedData) {
+      participants.push(...JSON.parse(cachedData));
+      console.log("Loaded participants from cache:", participants);
+      isInitialized = true;
+      const fontLoaded = await loadFont();
+      console.log("Initialization complete with cached data", { fontLoaded });
+      return;
     }
 
-    async function fetchCSVWithRetry(maxRetries = 5, delay = 2000) {
-      const csvUrl = "https://github.com/prashantmeni/Samskruti-Kannada-club-/blob/25751b0bc435555c9e625cec1cd21663bd7d3547/participants.csv";
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          console.log(`Fetching CSV, attempt ${attempt}...`);
-          const response = await fetch(csvUrl, {
-            method: "GET",
-            headers: {
-              "Accept": "text/csv",
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.text();
-          console.log("Raw CSV data:", data);
-
-          const parsed = Papa.parse(data, {
-            header: true,
-            skipEmptyLines: true,
-            transform: value => value.trim(),
-          });
-
-          if (parsed.errors.length > 0) {
-            throw new Error("CSV parsing errors: " + JSON.stringify(parsed.errors));
-          }
-
-          participants.length = 0;
-          parsed.data.forEach(row => {
-            if (row.name && row.usn) {
-              participants.push({
-                name: row.name.trim().toLowerCase(),
-                usn: row.usn.trim().toUpperCase(),
-              });
-            }
-          });
-
-          if (participants.length === 0) {
-            throw new Error("No valid participants found in CSV");
-          }
-
-          console.log("Participants loaded:", participants);
-          localStorage.setItem("participants", JSON.stringify(participants));
-          return true;
-        } catch (error) {
-          console.error(`Attempt ${attempt} failed:`, error);
-          if (attempt === maxRetries) {
-            console.warn("Using fallback participant data");
-            participants.length = 0;
-            participants.push(
-              { name: "Prashant", usn: "1CR24ec414" },
-              { name: "jane smith", usn: "1CM21CS124" }
-            );
-            console.log("Fallback participants loaded:", participants);
-            localStorage.setItem("participants", JSON.stringify(participants));
-            return false;
-          }
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
+    const [fontLoaded, csvLoaded] = await Promise.all([loadFont(), fetchCSVWithRetry()]);
+    isInitialized = true;
+    console.log("Initialization complete", { fontLoaded, csvLoaded });
+    if (!csvLoaded) {
+      errorMessage.textContent =
+        currentLang === "kn"
+          ? "CSV ಲೋಡ್ ಆಗಲಿಲ್ಲ, ಆದರೆ ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ (PRASHANT, 1CR24EC414 ಸೇರಿದಂತೆ)."
+          : "CSV failed to load, using fallback data (including PRASHANT, 1CR24EC414).";
+      errorMessage.style.display = "block";
     }
+  } catch (error) {
+    console.error("Initialization failed:", error);
+    errorMessage.textContent =
+      currentLang === "kn"
+        ? `ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ: ${error.message}. ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ.`
+        : `Failed to load initial data: ${error.message}. Using fallback data.`;
+    errorMessage.style.display = "block";
+    isInitialized = true; // Allow form submission with fallback data
+  } finally {
+    loadingMessage.style.display = "none";
+  }
+}
 
-    async function loadImage(url, maxRetries = 5, delay = 2000) {
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          console.log(`Loading image, attempt ${attempt}...`);
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          return await new Promise((resolve, reject) => {
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
-            img.src = url;
-          });
-        } catch (error) {
-          console.error(`Image load attempt ${attempt} failed:`, error);
-          if (attempt === maxRetries) throw error;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
+initialize();
+
+document.getElementById("certificate-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  errorMessage.style.display = "none";
+  loadingMessage.style.display = "block";
+
+  if (!isInitialized) {
+    errorMessage.textContent =
+      currentLang === "kn"
+        ? "ದಯವಿಟ್ಟು ಡೇಟಾ ಲೋಡ್ ಆಗುವವರೆಗೆ ಕಾಯಿರಿ."
+        : "Please wait until data is loaded.";
+    errorMessage.style.display = "block";
+    loadingMessage.style.display = "none";
+    return;
+  }
+
+  const nameInput = document.getElementById("name").value.trim();
+  const usnInput = document.getElementById("usn").value.trim().toUpperCase();
+  console.log("Form inputs:", { name: nameInput, usn: usnInput });
+
+  // Validate USN format
+  if (!/^[0-9A-Z]{10}$/.test(usnInput)) {
+    errorMessage.textContent =
+      currentLang === "kn"
+        ? "ಯುಎಸ್‌ಎನ್ ಸ್ವರೂಪ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಸರಿಯಾದ 10-ಅಂಕಿಯ ಯುಎಸ್‌ಎನ್ ನಮೂದಿಸಿ."
+        : "Invalid USN format. Please enter a valid 10-character USN.";
+    errorMessage.style.display = "block";
+    loadingMessage.style.display = "none";
+    return;
+  }
+
+  console.log("Available participants:", participants);
+
+  const participant = participants.find(p =>
+    p.name === nameInput.toLowerCase() && p.usn === usnInput
+  );
+  console.log("Found participant:", participant);
+
+  if (!participant) {
+    errorMessage.textContent =
+      currentLang === "kn"
+        ? `ಹೆಸರು "${nameInput}" ಮತ್ತು ಯುಎಸ್‌ಎನ್ "${usnInput}" ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`
+        : `Participant with name "${nameInput}" and USN "${usnInput}" not found. Please check the provided details.`;
+    errorMessage.style.display = "block";
+    loadingMessage.style.display = "none";
+    return;
+  }
+
+  try {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("jsPDF library not loaded");
     }
-
-    async function initialize() {
-      try {
-        loadingMessage.style.display = "block";
-        errorMessage.style.display = "none";
-
-        // Check cached participants
-        const cachedParticipants = localStorage.getItem("participants");
-        if (cachedParticipants) {
-          participants.push(...JSON.parse(cachedParticipants));
-          console.log("Loaded participants from cache:", participants);
-          isInitialized = true;
-          return;
-        }
-
-        const [fontLoaded, csvLoaded] = await Promise.all([loadFont(), fetchCSVWithRetry()]);
-        isInitialized = true;
-        console.log("Initialization complete", { fontLoaded, csvLoaded });
-        if (!csvLoaded) {
-          errorMessage.textContent =
-            currentLang === "kn"
-              ? "CSV ಲೋಡ್ ಆಗಲಿಲ್ಲ, ಆದರೆ ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ."
-              : "CSV failed to load, using fallback data.";
-          errorMessage.style.display = "block";
-        }
-      } catch (error) {
-        console.error("Initialization failed:", error);
-        errorMessage.textContent =
-          currentLang === "kn"
-            ? `ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
-            : `Failed to load initial data: ${error.message}. Please try again.`;
-        errorMessage.style.display = "block";
-      } finally {
-        loadingMessage.style.display = "none";
-      }
-    }
-
-    initialize();
-
-    document.getElementById("certificate-form").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      errorMessage.style.display = "none";
-      loadingMessage.style.display = "block";
-
-      if (!isInitialized) {
-        errorMessage.textContent =
-          currentLang === "kn"
-            ? "ದಯವಿಟ್ಟು ಡೇಟಾ ಲೋಡ್ ಆಗುವವರೆಗೆ ಕಾಯಿರಿ."
-            : "Please wait until data is loaded.";
-        errorMessage.style.display = "block";
-        loadingMessage.style.display = "none";
-        return;
-      }
-
-      const nameInput = document.getElementById("name").value.trim();
-      const usnInput = document.getElementById("usn").value.trim().toUpperCase();
-      console.log("Form inputs:", { name: nameInput, usn: usnInput });
-
-      console.log("Available participants:", participants);
-
-      const participant = participants.find(p =>
-        p.name === nameInput.toLowerCase() && p.usn === usnInput
-      );
-      console.log("Found participant:", participant);
-
-      if (!participant) {
-        errorMessage.textContent =
-          currentLang === "kn"
-            ? `ಹೆಸರು "${nameInput}" ಮತ್ತು ಯುಎಸ್‌ಎನ್ "${usnInput}" ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`
-            : `Participant with name "${nameInput}" and USN "${usnInput}" not found. Please check the provided details.`;
-        errorMessage.style.display = "block";
-        loadingMessage.style.display = "none";
-        return;
-      }
-
-      try {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          throw new Error("jsPDF library not loaded");
-        }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-          orientation: "landscape",
-          unit: "mm",
-          format: "a4",
-        });
-
-        const templateUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/8bdca36973e6d87245102c1756bfc8c2410d53f5/certificate.png";
-        const img = await loadImage(templateUrl);
-        doc.addImage(img, "PNG", 0, 0, 297, 210);
-
-        const textConfig = {
-          name: { x: 148.5, y: 90, size: 24, align: "center" },
-          usn: { x: 148.5, y: 110, size: 16, align: "center" },
-          date: { x: 148.5, y: 130, size: 14, align: "center" },
-        };
-
-        doc.setFont(currentLang === "kn" ? "Nudi17e" : "helvetica", "normal");
-        doc.setTextColor(0, 0, 0);
-
-        doc.setFontSize(textConfig.name.size);
-        doc.text(nameInput, textConfig.name.x, textConfig.name.y, { align: textConfig.name.align });
-
-        doc.setFontSize(textConfig.usn.size);
-        doc.text(
-          currentLang === "kn" ? `ಯುಎಸ್‌ಎನ್: ${usnInput}` : `USN: ${usnInput}`,
-          textConfig.usn.x,
-          textConfig.usn.y,
-          { align: textConfig.usn.align }
-        );
-
-        doc.setFontSize(textConfig.date.size);
-        doc.text(
-          currentLang === "kn" ? "ದಿನಾಂಕ: ನವೆಂಬರ್ 1, 2025" : "Date: November 1, 2025",
-          textConfig.date.x,
-          textConfig.date.y,
-          { align: textConfig.date.align }
-        );
-
-        doc.save(`certificate_${nameInput}.pdf`);
-        console.log("Certificate generated successfully for:", nameInput, usnInput);
-      } catch (error) {
-        console.error("Error generating certificate:", error);
-        errorMessage.textContent =
-          currentLang === "kn"
-            ? `ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
-            : `Error generating certificate: ${error.message}. Please try again.`;
-        errorMessage.style.display = "block";
-      } finally {
-        loadingMessage.style.display = "none";
-      }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
     });
+
+    // Updated image URL with CORS proxy and raw URL for the provided commit
+    const templateUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/8bdca36973e6d87245102c1756bfc8c2410d53f5/certificate.png";
+    let img;
+    try {
+      img = await loadImage(templateUrl);
+    } catch (error) {
+      console.warn("Using default image due to fetch failure:", error);
+      img = new Image();
+      img.src = "https://via.placeholder.com/297x210.png?text=Certificate+Template"; // Fallback image
+      await new Promise(resolve => { img.onload = resolve; });
+    }
+    doc.addImage(img, "PNG", 0, 0, 297, 210);
+
+    const textConfig = {
+      name: { x: 148.5, y: 90, size: 24, align: "center" },
+      usn: { x: 148.5, y: 110, size: 16, align: "center" },
+      date: { x: 148.5, y: 130, size: 14, align: "center" },
+    };
+
+    doc.setFont(currentLang === "kn" ? "Nudi17e" : "helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+
+    doc.setFontSize(textConfig.name.size);
+    doc.text(nameInput, textConfig.name.x, textConfig.name.y, { align: textConfig.name.align });
+
+    doc.setFontSize(textConfig.usn.size);
+    doc.text(
+      currentLang === "kn" ? `ಯುಎಸ್‌ಎನ್: ${usnInput}` : `USN: ${usnInput}`,
+      textConfig.usn.x,
+      textConfig.usn.y,
+      { align: textConfig.usn.align }
+    );
+
+    // Use current date and time (07:32 PM IST, July 20, 2025)
+    const currentDate = new Date().toLocaleString("en-IN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "Asia/Kolkata"
+    }).replace(" at ", ", "); // Format: "July 20, 2025, 07:32 PM"
+    doc.setFontSize(textConfig.date.size);
+    doc.text(
+      currentLang === "kn" ? `ದಿನಾಂಕ: ${currentDate}` : `Date: ${currentDate}`,
+      textConfig.date.x,
+      textConfig.date.y,
+      { align: textConfig.date.align }
+    );
+
+    doc.save(`certificate_${nameInput}.pdf`);
+    console.log("Certificate generated successfully for:", nameInput, usnInput);
+  } catch (error) {
+    console.error("Error generating certificate:", error);
+    errorMessage.textContent =
+      currentLang === "kn"
+        ? `ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+        : `Error generating certificate: ${error.message}. Please try again.`;
+    errorMessage.style.display = "block";
+  } finally {
+    loadingMessage.style.display = "none";
+  }
+});
   </script>
 </body>
 </html>
