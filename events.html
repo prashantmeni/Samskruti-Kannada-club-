@@ -470,53 +470,65 @@ const loadingMessage = document.getElementById("loading-message");
 let isInitialized = false;
 
 async function loadFont() {
-  const fontUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
+  const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
+
   try {
-    console.log("Attempting to fetch font...");
-    const fontBytes = await fetch(fontUrl).then(res => {
-      if (!res.ok) throw new Error(`Failed to fetch font: ${res.status} ${res.statusText}`);
-      return res.arrayBuffer();
-    });
+    console.log("Fetching font...");
+    const response = await fetch(fontUrl);
+    if (!response.ok) throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
+    const buffer = await response.arrayBuffer();
+
+    // Convert ArrayBuffer → Base64
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+    const base64Font = arrayBufferToBase64(buffer);
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.addFileToVFS("Nudi17eRegular.ttf", fontBytes);
+    doc.addFileToVFS("Nudi17eRegular.ttf", base64Font);
     doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
-    console.log("Font loaded successfully");
+    console.log("Font loaded ✅");
     return true;
   } catch (error) {
-    console.error("Failed to load font, using fallback font (Helvetica):", error);
-    return false; // Fallback to Helvetica
+    console.error("Font load failed, fallback Helvetica:", error);
+    return false;
   }
 }
 
+
 async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
-  const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
+  const csvUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
+
+  // Check cache first
+  const cachedData = localStorage.getItem("participants");
+  if (cachedData) {
+    participants.length = 0;
+    participants.push(...JSON.parse(cachedData));
+    console.log("Loaded participants from cache:", participants);
+    return true;
+  }
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`Fetching CSV, attempt ${attempt}/${maxRetries}...`);
-      const response = await fetch(csvUrl, {
-        method: "GET",
-        headers: {
-          "Accept": "text/csv",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
-      }
+      const response = await fetch(csvUrl, { headers: { "Accept": "text/csv" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
 
       const data = await response.text();
-      console.log("Raw CSV data:", data);
-
       const parsed = Papa.parse(data, {
         header: true,
         skipEmptyLines: true,
-        transform: value => value.trim(),
+        transform: v => v.trim(),
       });
 
-      if (parsed.errors.length > 0) {
-        throw new Error("CSV parsing errors: " + JSON.stringify(parsed.errors));
-      }
+      if (parsed.errors.length) throw new Error("CSV parse errors: " + JSON.stringify(parsed.errors));
 
       participants.length = 0;
       parsed.data.forEach(row => {
@@ -528,15 +540,14 @@ async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
         }
       });
 
-      if (participants.length === 0) {
-        throw new Error("No valid participants found in CSV");
-      }
+      if (!participants.length) throw new Error("No valid participants in CSV");
 
       console.log("Participants loaded:", participants);
       localStorage.setItem("participants", JSON.stringify(participants));
       return true;
-    } catch (error) {
-      console.error(`Attempt ${attempt}/${maxRetries} failed:`, error);
+
+    } catch (err) {
+      console.error(`Attempt ${attempt}/${maxRetries} failed:`, err);
       if (attempt === maxRetries) {
         console.warn("Using fallback participant data");
         participants.length = 0;
@@ -545,11 +556,10 @@ async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
           { name: "jane smith", usn: "1CM21CS124" },
           { name: "prashant", usn: "1CR24EC414" }
         );
-        console.log("Fallback participants loaded:", participants);
         localStorage.setItem("participants", JSON.stringify(participants));
         return false;
       }
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise(r => setTimeout(r, delay));
     }
   }
 }
@@ -558,20 +568,21 @@ async function loadImage(url, maxRetries = 8, delay = 4000) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`Loading image, attempt ${attempt}/${maxRetries}...`);
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
       return await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+        img.onerror = () => reject(new Error(`Image load failed from ${url}`));
         img.src = url;
       });
-    } catch (error) {
-      console.error(`Image load attempt ${attempt}/${maxRetries} failed:`, error);
-      if (attempt === maxRetries) throw error;
-      await new Promise(resolve => setTimeout(resolve, delay));
+    } catch (err) {
+      console.error(`Image load attempt ${attempt}/${maxRetries} failed:`, err);
+      if (attempt === maxRetries) throw err;
+      await new Promise(r => setTimeout(r, delay));
     }
   }
 }
+
 
 async function initialize() {
   try {
@@ -582,15 +593,15 @@ async function initialize() {
     localStorage.removeItem("participants");
 
     // Check cached participants
-    const cachedData = localStorage.getItem("participants");
-    if (cachedData) {
-      participants.push(...JSON.parse(cachedData));
-      console.log("Loaded participants from cache:", participants);
-      isInitialized = true;
-      const fontLoaded = await loadFont();
-      console.log("Initialization complete with cached data", { fontLoaded });
-      return;
-    }
+const cachedData = localStorage.getItem("participants");
+if (cachedData) {
+  participants.push(...JSON.parse(cachedData));
+  console.log("Loaded participants from cache:", participants);
+  isInitialized = true;
+  await loadFont();
+  return;
+}
+
 
     const [fontLoaded, csvLoaded] = await Promise.all([loadFont(), fetchCSVWithRetry()]);
     isInitialized = true;
@@ -637,15 +648,16 @@ document.getElementById("certificate-form").addEventListener("submit", async fun
   console.log("Form inputs:", { name: nameInput, usn: usnInput });
 
   // Validate USN format
-  if (!/^[0-9A-Z]{10}$/.test(usnInput)) {
-    errorMessage.textContent =
-      currentLang === "kn"
-        ? "ಯುಎಸ್‌ಎನ್ ಸ್ವರೂಪ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಸರಿಯಾದ 10-ಅಂಕಿಯ ಯುಎಸ್‌ಎನ್ ನಮೂದಿಸಿ."
-        : "Invalid USN format. Please enter a valid 10-character USN.";
-    errorMessage.style.display = "block";
-    loadingMessage.style.display = "none";
-    return;
-  }
+  if (!/^[0-9A-Z]{9,12}$/.test(usnInput)) {
+  errorMessage.textContent =
+    currentLang === "kn"
+      ? "ಯುಎಸ್‌ಎನ್ ಸ್ವರೂಪ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಸರಿಯಾದ ಯುಎಸ್‌ಎನ್ ನಮೂದಿಸಿ."
+      : "Invalid USN format. Please enter a valid USN.";
+  errorMessage.style.display = "block";
+  loadingMessage.style.display = "none";
+  return;
+}
+
 
   console.log("Available participants:", participants);
 
