@@ -432,32 +432,75 @@
     }
 
     async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
-      const csvUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-          const response = await fetch(csvUrl, { headers: { "Accept": "text/csv" } });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const data = await response.text();
-          const parsed = Papa.parse(data, { header: true, skipEmptyLines: true, transform: v => v.trim() });
-          participants.length = 0;
-          parsed.data.forEach(row => {
-            if (row.name && row.usn) {
-              participants.push({ name: row.name.toLowerCase(), usn: row.usn.toUpperCase() });
-            }
-          });
-          localStorage.setItem("participants", JSON.stringify(participants));
-          return true;
-        } catch (err) {
-          console.warn(`CSV load attempt ${attempt} failed:`, err);
-          if (attempt === maxRetries) {
-            participants.push({ name: "prashant", usn: "1CR24EC414" });
-            localStorage.setItem("participants", JSON.stringify(participants));
-            return false;
-          }
-          await new Promise(r => setTimeout(r, delay));
-        }
+  const csvUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Fetching CSV, attempt ${attempt}/${maxRetries}...`);
+      const response = await fetch(csvUrl, {
+        method: "GET",
+        headers: { "Accept": "text/csv" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
       }
+
+      const data = await response.text();
+      console.log("Raw CSV data:", data);
+
+      const parsed = Papa.parse(data, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: header => header.trim().toLowerCase(), // normalize headers
+        transform: value => value.trim(), // trim all values
+      });
+
+      if (parsed.errors.length > 0) {
+        throw new Error("CSV parsing errors: " + JSON.stringify(parsed.errors));
+      }
+
+      participants.length = 0;
+      parsed.data.forEach(row => {
+        const name = row.name || row.fullname || row["full name"] || row.student || "";
+        const usn = row.usn || row["student usn"] || "";
+
+        if (name && usn) {
+          participants.push({
+            name: name.trim().toLowerCase(),
+            usn: usn.trim().toUpperCase(),
+          });
+        }
+      });
+
+      if (participants.length === 0) {
+        throw new Error("No valid participants found in CSV");
+      }
+
+      console.log("Participants loaded:", participants);
+      localStorage.setItem("participants", JSON.stringify(participants));
+      return true;
+
+    } catch (error) {
+      console.error(`Attempt ${attempt}/${maxRetries} failed:`, error);
+
+      if (attempt === maxRetries) {
+        console.warn("Using fallback participant data");
+        participants.length = 0;
+        participants.push(
+          { name: "john doe", usn: "1CM21CS123" },
+          { name: "jane smith", usn: "1CM21CS124" },
+          { name: "prashant", usn: "1CR24EC414" }
+        );
+        console.log("Fallback participants loaded:", participants);
+        localStorage.setItem("participants", JSON.stringify(participants));
+        return false;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
+  }
+}
 
     async function loadImage(url) {
       return new Promise((resolve, reject) => {
