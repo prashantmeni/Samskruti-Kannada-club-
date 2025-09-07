@@ -9,7 +9,7 @@
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    * {
+     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -305,18 +305,16 @@
   <div class="content">
     <div class="section">
       <div class="section-title">
-        <i class="fas fa-star"></i> <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
+        <i class="fas fa-star"></i> 
+        <span data-en="Upcoming Events" data-kn="ಮುಂಬರುವ ಕಾರ್ಯಕ್ರಮಗಳು">Upcoming Events</span>
       </div>
-      <div id="eventPreview" class="event-list">
-        <!-- Events will be dynamically added here -->
-      </div>
-      <p id="noEventsMessage" class="error-message" data-en="Next event will come soon!" data-kn="ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!." style="display: none;">
-        No upcoming events available.
-      </p>
+      <div id="eventPreview" class="event-list"></div>
+      <p id="noEventsMessage" class="error-message" data-en="Next event will come soon!" data-kn="ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!." style="display: none;"></p>
 
       <div class="certificate-section">
         <div class="section-title">
-          <i class="fas fa-certificate"></i> <span data-en="Download Your E-Certificate" data-kn="ನಿಮ್ಮ ಇ-ಪ್ರಮಾಣಪತ್ರವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ">Download Your E-Certificate</span>
+          <i class="fas fa-certificate"></i> 
+          <span data-en="Download Your E-Certificate" data-kn="ನಿಮ್ಮ ಇ-ಪ್ರಮಾಣಪತ್ರವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ">Download Your E-Certificate</span>
         </div>
         <p id="error-message" class="error-message"></p>
         <div id="loading-message" class="error-message" style="display: none;">Loading...</div>
@@ -337,44 +335,34 @@
 
   <footer id="footer">
     <div class="footer-nav">
-      <a href="index.html" aria-label="Go to Home page"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
-      <a href="gallery.html" aria-label="Go to Gallery page"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
-      <a href="events.html" class="active" aria-label="Go to Events page"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
-      <a href="about.html" aria-label="Go to About page"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
+      <a href="index.html"><i class="fas fa-home"></i> <span data-en="Home" data-kn="ಮುಖಪುಟ">Home</span></a>
+      <a href="gallery.html"><i class="fas fa-camera-retro"></i> <span data-en="Gallery" data-kn="ಗ್ಯಾಲರಿ">Gallery</span></a>
+      <a href="events.html" class="active"><i class="fas fa-id-card"></i> <span data-en="Events" data-kn="ಕಾರ್ಯಕ್ರಮಗಳು">Events</span></a>
+      <a href="about.html"><i class="fas fa-user"></i> <span data-en="About" data-kn="ನಮ್ಮ ಬಗ್ಗೆ">About</span></a>
     </div>
   </footer>
 
   <script>
-    // Canvas Animation for Club Name
+    /*********** 🔹 Canvas Animation for Club Name ***********/
     const canvas = document.getElementById("clubNameCanvas");
     const ctx = canvas.getContext("2d");
     let width, height;
-
     function resizeCanvas() {
       width = canvas.parentElement.clientWidth - 120;
       height = 40;
       canvas.width = width;
       canvas.height = height;
     }
-
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
     const text = "ಸಂಸ್ಕೃತಿ ಕನ್ನಡ ಸಂಘ";
     const fontSize = 22;
-    let alpha = 0;
-    let scale = 1;
-    let time = 0;
+    let alpha = 0, scale = 1, time = 0;
 
     function animateText() {
-      if (document.visibilityState === "hidden") {
-        requestAnimationFrame(animateText);
-        return;
-      }
-
       ctx.clearRect(0, 0, width, height);
       time += 0.05;
-
       ctx.font = `${fontSize}px 'Noto Sans Kannada', sans-serif`;
       const textWidth = ctx.measureText(text).width;
       const x = (width - textWidth) / 2;
@@ -397,360 +385,146 @@
       ctx.fillText(text, x, y);
       ctx.restore();
 
-      if (time > 2 * Math.PI) {
-        time = 0;
-        alpha = 0;
-      }
-
+      if (time > 2 * Math.PI) { time = 0; alpha = 0; }
       requestAnimationFrame(animateText);
     }
-
     animateText();
 
-    // Language Toggle
+    /*********** 🔹 Language Toggle ***********/
     const langBtn = document.getElementById("langBtn");
     let currentLang = localStorage.getItem("preferredLang") || "kn";
-
     function updateLanguage(lang) {
-      document.querySelectorAll('[data-en]').forEach(el => {
+      document.querySelectorAll("[data-en]").forEach(el => {
         el.textContent = el.getAttribute(`data-${lang}`);
       });
       langBtn.textContent = lang === "kn" ? "ಕ" : "E";
       document.documentElement.lang = lang;
       localStorage.setItem("preferredLang", lang);
     }
-
     langBtn.addEventListener("click", () => {
       currentLang = currentLang === "kn" ? "en" : "kn";
       updateLanguage(currentLang);
     });
-
     updateLanguage(currentLang);
 
-    // Check for events and show/hide "No Events" message
-    function updateEventSection() {
-      const eventPreview = document.getElementById("eventPreview");
-      const noEventsMessage = document.getElementById("noEventsMessage");
+    /*********** 🔹 Certificate Logic ***********/
+    const participants = [];
+    const errorMessage = document.getElementById("error-message");
+    const loadingMessage = document.getElementById("loading-message");
+    let isInitialized = false;
 
-      if (eventPreview.children.length === 0) {
-        noEventsMessage.style.display = "block";
-      } else {
-        noEventsMessage.style.display = "none";
-      }
-    }
-
-    updateEventSection();
-
-    // Footer Navigation Highlight
-    const currentPage = window.location.pathname.split("/").pop() || "index.html";
-    document.querySelectorAll(".footer-nav a").forEach(link => {
-      if (link.getAttribute("href") === currentPage) {
-        link.classList.add("active");
-      }
-    });
-
-    // Footer Scroll Behavior
-    let lastScroll = 0;
-    const footer = document.getElementById("footer");
-
-    window.addEventListener("scroll", () => {
-      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-      if (currentScroll > lastScroll) {
-        footer.classList.add("hidden");
-      } else {
-        footer.classList.remove("hidden");
-      }
-      lastScroll = currentScroll <= 0 ? 0 : currentScroll;
-    });
-
-    // Certificate Generation
-const participants = [];
-const errorMessage = document.getElementById("error-message");
-const loadingMessage = document.getElementById("loading-message");
-let isInitialized = false;
-
-async function loadFont() {
-  const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
-
-  try {
-    console.log("Fetching font...");
-    const response = await fetch(fontUrl);
-    if (!response.ok) throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
-    const buffer = await response.arrayBuffer();
-
-    // Convert ArrayBuffer → Base64
-    function arrayBufferToBase64(buffer) {
-      let binary = '';
-      const bytes = new Uint8Array(buffer);
-      const len = bytes.byteLength;
-      for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      return btoa(binary);
-    }
-    const base64Font = arrayBufferToBase64(buffer);
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.addFileToVFS("Nudi17eRegular.ttf", base64Font);
-    doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
-    console.log("Font loaded ✅");
-    return true;
-  } catch (error) {
-    console.error("Font load failed, fallback Helvetica:", error);
-    return false;
-  }
-}
-
-
-async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
-  const csvUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
-
-  // Check cache first
-  const cachedData = localStorage.getItem("participants");
-  if (cachedData) {
-    participants.length = 0;
-    participants.push(...JSON.parse(cachedData));
-    console.log("Loaded participants from cache:", participants);
-    return true;
-  }
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      console.log(`Fetching CSV, attempt ${attempt}/${maxRetries}...`);
-      const response = await fetch(csvUrl, { headers: { "Accept": "text/csv" } });
-      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
-
-      const data = await response.text();
-      const parsed = Papa.parse(data, {
-        header: true,
-        skipEmptyLines: true,
-        transform: v => v.trim(),
-      });
-
-      if (parsed.errors.length) throw new Error("CSV parse errors: " + JSON.stringify(parsed.errors));
-
-      participants.length = 0;
-      parsed.data.forEach(row => {
-        if (row.name && row.usn) {
-          participants.push({
-            name: row.name.trim().toLowerCase(),
-            usn: row.usn.trim().toUpperCase(),
-          });
-        }
-      });
-
-      if (!participants.length) throw new Error("No valid participants in CSV");
-
-      console.log("Participants loaded:", participants);
-      localStorage.setItem("participants", JSON.stringify(participants));
-      return true;
-
-    } catch (err) {
-      console.error(`Attempt ${attempt}/${maxRetries} failed:`, err);
-      if (attempt === maxRetries) {
-        console.warn("Using fallback participant data");
-        participants.length = 0;
-        participants.push(
-          { name: "john doe", usn: "1CM21CS123" },
-          { name: "jane smith", usn: "1CM21CS124" },
-          { name: "prashant", usn: "1CR24EC414" }
-        );
-        localStorage.setItem("participants", JSON.stringify(participants));
+    async function loadFont() {
+      const fontUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/Nudi%2017%20e%20Regular.ttf";
+      try {
+        const response = await fetch(fontUrl);
+        if (!response.ok) throw new Error(`Font fetch failed: ${response.status}`);
+        const buffer = await response.arrayBuffer();
+        const base64Font = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.addFileToVFS("Nudi17eRegular.ttf", base64Font);
+        doc.addFont("Nudi17eRegular.ttf", "Nudi17e", "normal");
+        return true;
+      } catch (err) {
+        console.error("Font load failed:", err);
         return false;
       }
-      await new Promise(r => setTimeout(r, delay));
     }
-  }
-}
 
-async function loadImage(url, maxRetries = 8, delay = 4000) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      console.log(`Loading image, attempt ${attempt}/${maxRetries}...`);
-      return await new Promise((resolve, reject) => {
+    async function fetchCSVWithRetry(maxRetries = 6, delay = 3000) {
+      const csvUrl = "https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/participants.csv";
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await fetch(csvUrl, { headers: { "Accept": "text/csv" } });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.text();
+          const parsed = Papa.parse(data, { header: true, skipEmptyLines: true, transform: v => v.trim() });
+          participants.length = 0;
+          parsed.data.forEach(row => {
+            if (row.name && row.usn) {
+              participants.push({ name: row.name.toLowerCase(), usn: row.usn.toUpperCase() });
+            }
+          });
+          localStorage.setItem("participants", JSON.stringify(participants));
+          return true;
+        } catch (err) {
+          console.warn(`CSV load attempt ${attempt} failed:`, err);
+          if (attempt === maxRetries) {
+            participants.push({ name: "prashant", usn: "1CR24EC414" });
+            localStorage.setItem("participants", JSON.stringify(participants));
+            return false;
+          }
+          await new Promise(r => setTimeout(r, delay));
+        }
+      }
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Image load failed from ${url}`));
+        img.onerror = () => reject(new Error("Image load failed"));
         img.src = url;
       });
-    } catch (err) {
-      console.error(`Image load attempt ${attempt}/${maxRetries} failed:`, err);
-      if (attempt === maxRetries) throw err;
-      await new Promise(r => setTimeout(r, delay));
     }
-  }
-}
 
-
-async function initialize() {
-  try {
-    loadingMessage.style.display = "block";
-    errorMessage.style.display = "none";
-
-    // Clear cache to force fresh fetch
-    localStorage.removeItem("participants");
-
-    // Check cached participants
-const cachedData = localStorage.getItem("participants");
-if (cachedData) {
-  participants.push(...JSON.parse(cachedData));
-  console.log("Loaded participants from cache:", participants);
-  isInitialized = true;
-  await loadFont();
-  return;
-}
-
-
-    const [fontLoaded, csvLoaded] = await Promise.all([loadFont(), fetchCSVWithRetry()]);
-    isInitialized = true;
-    console.log("Initialization complete", { fontLoaded, csvLoaded });
-    if (!csvLoaded) {
-      errorMessage.textContent =
-        currentLang === "kn"
-          ? "CSV ಲೋಡ್ ಆಗಲಿಲ್ಲ, ಆದರೆ ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ (PRASHANT, 1CR24EC414 ಸೇರಿದಂತೆ)."
-          : "CSV failed to load, using fallback data (including PRASHANT, 1CR24EC414).";
-      errorMessage.style.display = "block";
+    async function initialize() {
+      try {
+        loadingMessage.style.display = "block";
+        const cached = localStorage.getItem("participants");
+        if (cached) {
+          participants.push(...JSON.parse(cached));
+          await loadFont();
+          isInitialized = true;
+          return;
+        }
+        await Promise.all([loadFont(), fetchCSVWithRetry()]);
+        isInitialized = true;
+      } catch (err) {
+        console.error("Init failed:", err);
+        isInitialized = true;
+      } finally {
+        loadingMessage.style.display = "none";
+      }
     }
-  } catch (error) {
-    console.error("Initialization failed:", error);
-    errorMessage.textContent =
-      currentLang === "kn"
-        ? `ಪ್ರಾರಂಭಿಕ ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ: ${error.message}. ಫಾಲ್‌ಬ್ಯಾಕ್ ಡೇಟಾವನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ.`
-        : `Failed to load initial data: ${error.message}. Using fallback data.`;
-    errorMessage.style.display = "block";
-    isInitialized = true; // Allow form submission with fallback data
-  } finally {
-    loadingMessage.style.display = "none";
-  }
-}
+    initialize();
 
-initialize();
+    document.getElementById("certificate-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!isInitialized) return;
 
-document.getElementById("certificate-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  errorMessage.style.display = "none";
-  loadingMessage.style.display = "block";
+      const name = document.getElementById("name").value.trim().toLowerCase();
+      const usn = document.getElementById("usn").value.trim().toUpperCase();
 
-  if (!isInitialized) {
-    errorMessage.textContent =
-      currentLang === "kn"
-        ? "ದಯವಿಟ್ಟು ಡೇಟಾ ಲೋಡ್ ಆಗುವವರೆಗೆ ಕಾಯಿರಿ."
-        : "Please wait until data is loaded.";
-    errorMessage.style.display = "block";
-    loadingMessage.style.display = "none";
-    return;
-  }
+      const participant = participants.find(p => p.name === name && p.usn === usn);
+      if (!participant) {
+        errorMessage.textContent = currentLang === "kn" ? "ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ" : "Participant not found";
+        errorMessage.style.display = "block";
+        return;
+      }
 
-  const nameInput = document.getElementById("name").value.trim();
-  const usnInput = document.getElementById("usn").value.trim().toUpperCase();
-  console.log("Form inputs:", { name: nameInput, usn: usnInput });
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      let img;
+      try {
+        img = await loadImage("https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/main/certificate.png");
+      } catch {
+        img = await loadImage("https://via.placeholder.com/297x210.png?text=Certificate+Template");
+      }
+      doc.addImage(img, "PNG", 0, 0, 297, 210);
 
-  // Validate USN format
-  if (!/^[0-9A-Z]{9,12}$/.test(usnInput)) {
-  errorMessage.textContent =
-    currentLang === "kn"
-      ? "ಯುಎಸ್‌ಎನ್ ಸ್ವರೂಪ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಸರಿಯಾದ ಯುಎಸ್‌ಎನ್ ನಮೂದಿಸಿ."
-      : "Invalid USN format. Please enter a valid USN.";
-  errorMessage.style.display = "block";
-  loadingMessage.style.display = "none";
-  return;
-}
+      doc.setFont(currentLang === "kn" ? "Nudi17e" : "helvetica", "normal");
+      doc.setFontSize(24);
+      doc.text(participant.name, 148.5, 90, { align: "center" });
+      doc.setFontSize(16);
+      doc.text(`USN: ${participant.usn}`, 148.5, 110, { align: "center" });
+      doc.setFontSize(14);
+      const currentDate = new Date().toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+      doc.text(`Date: ${currentDate}`, 148.5, 130, { align: "center" });
 
-
-  console.log("Available participants:", participants);
-
-  const participant = participants.find(p =>
-    p.name === nameInput.toLowerCase() && p.usn === usnInput
-  );
-  console.log("Found participant:", participant);
-
-  if (!participant) {
-    errorMessage.textContent =
-      currentLang === "kn"
-        ? `ಹೆಸರು "${nameInput}" ಮತ್ತು ಯುಎಸ್‌ಎನ್ "${usnInput}" ಹೊಂದಿರುವ ಭಾಗವಹಿಸುವವರನ್ನು ಕಂಡುಹಿಡಿಯಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.`
-        : `Participant with name "${nameInput}" and USN "${usnInput}" not found. Please check the provided details.`;
-    errorMessage.style.display = "block";
-    loadingMessage.style.display = "none";
-    return;
-  }
-
-  try {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      throw new Error("jsPDF library not loaded");
-    }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
+      doc.save(`certificate_${participant.name}.pdf`);
     });
-
-    // Updated image URL with CORS proxy and raw URL for the provided commit
-    const templateUrl = "https://cors-anywhere.herokuapp.com/https://raw.githubusercontent.com/prashantmeni/Samskruti-Kannada-club-/8bdca36973e6d87245102c1756bfc8c2410d53f5/certificate.png";
-    let img;
-    try {
-      img = await loadImage(templateUrl);
-    } catch (error) {
-      console.warn("Using default image due to fetch failure:", error);
-      img = new Image();
-      img.src = "https://via.placeholder.com/297x210.png?text=Certificate+Template"; // Fallback image
-      await new Promise(resolve => { img.onload = resolve; });
-    }
-    doc.addImage(img, "PNG", 0, 0, 297, 210);
-
-    const textConfig = {
-      name: { x: 148.5, y: 90, size: 24, align: "center" },
-      usn: { x: 148.5, y: 110, size: 16, align: "center" },
-      date: { x: 148.5, y: 130, size: 14, align: "center" },
-    };
-
-    doc.setFont(currentLang === "kn" ? "Nudi17e" : "helvetica", "normal");
-    doc.setTextColor(0, 0, 0);
-
-    doc.setFontSize(textConfig.name.size);
-    doc.text(nameInput, textConfig.name.x, textConfig.name.y, { align: textConfig.name.align });
-
-    doc.setFontSize(textConfig.usn.size);
-    doc.text(
-      currentLang === "kn" ? `ಯುಎಸ್‌ಎನ್: ${usnInput}` : `USN: ${usnInput}`,
-      textConfig.usn.x,
-      textConfig.usn.y,
-      { align: textConfig.usn.align }
-    );
-
-    // Use current date and time (07:32 PM IST, July 20, 2025)
-    const currentDate = new Date().toLocaleString("en-IN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "Asia/Kolkata"
-    }).replace(" at ", ", "); // Format: "July 20, 2025, 07:32 PM"
-    doc.setFontSize(textConfig.date.size);
-    doc.text(
-      currentLang === "kn" ? `ದಿನಾಂಕ: ${currentDate}` : `Date: ${currentDate}`,
-      textConfig.date.x,
-      textConfig.date.y,
-      { align: textConfig.date.align }
-    );
-
-    doc.save(`certificate_${nameInput}.pdf`);
-    console.log("Certificate generated successfully for:", nameInput, usnInput);
-  } catch (error) {
-    console.error("Error generating certificate:", error);
-    errorMessage.textContent =
-      currentLang === "kn"
-        ? `ಪ್ರಮಾಣಪತ್ರ ರಚಿಸುವಲ್ಲಿ ದೋಷ: ${error.message}. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
-        : `Error generating certificate: ${error.message}. Please try again.`;
-    errorMessage.style.display = "block";
-  } finally {
-    loadingMessage.style.display = "none";
-  }
-});
   </script>
 </body>
 </html>
